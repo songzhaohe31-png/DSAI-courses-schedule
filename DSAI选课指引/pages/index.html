@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Selection Guidance | HKMU Data Science</title>
+    
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS v4 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'hkmu-blue': '#0066CC',
+                        'hkmu-green': '#2E7D52',
+                        'hkmu-light-blue': '#E3F2FD',
+                        'hkmu-light-green': '#E8F5E9',
+                        'success-green': '#4CAF50',
+                        'warning-orange': '#FF9800',
+                        'info-blue': '#2196F3',
+                        'locked-gray': '#9E9E9E',
+                        'text-primary': '#1A1A2E',
+                        'text-secondary': '#6B7280',
+                        'text-muted': '#9CA3AF',
+                        'page-bg': '#F5F7FA',
+                        'card-bg': '#FFFFFF',
+                        'core-blue': '#0066CC',
+                        'elective-purple': '#7C3AED',
+                        'project-amber': '#F59E0B',
+                        'english-emerald': '#10B981',
+                        'general-pink': '#EC4899',
+                        'university-indigo': '#6366F1',
+                    },
+                    fontFamily: {
+                        'sans': ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'sm': '0 1px 2px rgba(0, 0, 0, 0.05)',
+                        'md': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                        'lg': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+                        'xl': '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #F5F7FA;
+            color: #1A1A2E;
+        }
+        
+        /* Animated Gradient Background */
+        .hero-gradient {
+            background: linear-gradient(135deg, #0066CC 0%, #2E7D52 50%, #0066CC 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 8s ease infinite;
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        /* Floating Shapes Animation */
+        .floating-shape {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.1;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .floating-shape:nth-child(1) {
+            width: 300px;
+            height: 300px;
+            background: white;
+            top: -100px;
+            right: -50px;
+            animation-delay: 0s;
+        }
+        
+        .floating-shape:nth-child(2) {
+            width: 200px;
+            height: 200px;
+            background: white;
+            bottom: -50px;
+            left: 10%;
+            animation-delay: 2s;
+        }
+        
+        .floating-shape:nth-child(3) {
+            width: 150px;
+            height: 150px;
+            background: white;
+            top: 30%;
+            right: 20%;
+            animation-delay: 4s;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(10deg); }
+        }
+        
+        /* Page Load Animation */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .animate-fade-in-up {
+            animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            opacity: 0;
+        }
+        
+        .delay-100 { animation-delay: 0.1s; }
+        .delay-200 { animation-delay: 0.2s; }
+        .delay-300 { animation-delay: 0.3s; }
+        .delay-400 { animation-delay: 0.4s; }
+        .delay-500 { animation-delay: 0.5s; }
+        
+        /* Card Hover Effects */
+        .feature-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .feature-card:hover .feature-icon {
+            transform: scale(1.1);
+        }
+        
+        .feature-icon {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* Stat Card Animation */
+        .stat-card {
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: scale(1.02);
+        }
+        
+        /* Button Styles */
+        .btn-primary {
+            background: linear-gradient(135deg, #0066CC 0%, #0052a3 100%);
+            transition: all 0.2s ease-in-out;
+        }
+        
+        .btn-primary:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 12px rgba(0, 102, 204, 0.4);
+        }
+        
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: #0066CC;
+            border: 2px solid #0066CC;
+            transition: all 0.2s ease-in-out;
+        }
+        
+        .btn-secondary:hover {
+            background: #0066CC;
+            color: white;
+            transform: scale(1.02);
+        }
+        
+        .btn-secondary:active {
+            transform: scale(0.98);
+        }
+        
+        /* Step Card Styles */
+        .step-card {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .step-card:hover {
+            background: #E3F2FD;
+        }
+        
+        .step-number {
+            background: linear-gradient(135deg, #0066CC 0%, #2E7D52 100%);
+        }
+        
+        /* Quick Link Styles */
+        .quick-link {
+            transition: all 0.3s ease;
+        }
+        
+        .quick-link:hover {
+            transform: translateX(8px);
+            background: #E3F2FD;
+        }
+        
+        /* Navigation Styles */
+        .nav-link {
+            position: relative;
+            transition: color 0.2s ease;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #0066CC;
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover::after,
+        .nav-link.active::after {
+            width: 100%;
+        }
+        
+        /* Mobile Menu */
+        .mobile-menu {
+            transform: translateX(100%);
+            transition: transform 0.3s ease-in-out;
+        }
+        
+        .mobile-menu.open {
+            transform: translateX(0);
+        }
+        
+        /* Counter Animation */
+        @keyframes countUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .counter-animate {
+            animation: countUp 0.5s ease forwards;
+        }
+        
+        /* Pattern Background */
+        .pattern-bg {
+            background-image: 
+                radial-gradient(circle at 20% 80%, rgba(0, 102, 204, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(46, 125, 82, 0.05) 0%, transparent 50%);
+        }
+        
+        /* Scroll Reveal */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="bg-page-bg min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-hkmu-blue to-hkmu-green rounded-lg flex items-center justify-center">
+                        <i data-lucide="graduation-cap" class="w-6 h-6 text-white"></i>
+                    </div>
+                    <div class="hidden sm:block">
+                        <span class="text-lg font-bold text-text-primary">HKMU</span>
+                        <span class="text-sm text-text-secondary ml-1">Data Science</span>
+                    </div>
+                </div>
+                
+                <!-- Desktop Navigation -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="index.html" class="nav-link active text-hkmu-blue font-semibold">Home</a>
+                    <a href="progress.html" class="nav-link text-text-secondary hover:text-hkmu-blue font-medium">Degree Progress</a>
+                    <a href="courses.html" class="nav-link text-text-secondary hover:text-hkmu-blue font-medium">Courses</a>
+                    <a href="reviews.html" class="nav-link text-text-secondary hover:text-hkmu-blue font-medium">Reviews</a>
+                </div>
+                
+                <!-- Mobile Menu Button -->
+                <button id="mobileMenuBtn" class="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors">
+                    <i data-lucide="menu" class="w-6 h-6 text-text-primary"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div id="mobileMenu" class="mobile-menu fixed top-0 right-0 w-64 h-full bg-white shadow-xl z-50 md:hidden">
+            <div class="p-4">
+                <div class="flex justify-between items-center mb-8">
+                    <span class="font-bold text-text-primary">Menu</span>
+                    <button id="closeMobileMenu" class="p-2 rounded-lg hover:bg-gray-100">
+                        <i data-lucide="x" class="w-5 h-5 text-text-primary"></i>
+                    </button>
+                </div>
+                <div class="space-y-4">
+                    <a href="index.html" class="block py-2 px-4 bg-hkmu-light-blue text-hkmu-blue font-semibold rounded-lg">Home</a>
+                    <a href="progress.html" class="block py-2 px-4 text-text-secondary hover:bg-gray-100 rounded-lg transition-colors">Degree Progress</a>
+                    <a href="courses.html" class="block py-2 px-4 text-text-secondary hover:bg-gray-100 rounded-lg transition-colors">Courses</a>
+                    <a href="reviews.html" class="block py-2 px-4 text-text-secondary hover:bg-gray-100 rounded-lg transition-colors">Reviews</a>
+                </div>
+            </div>
+        </div>
+        <div id="mobileOverlay" class="fixed inset-0 bg-black/50 z-40 hidden md:hidden"></div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-gradient relative overflow-hidden min-h-[500px] flex items-center">
+        <!-- Floating Shapes -->
+        <div class="floating-shape"></div>
+        <div class="floating-shape"></div>
+        <div class="floating-shape"></div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 relative z-10">
+            <div class="text-center max-w-3xl mx-auto">
+                <div class="animate-fade-in-up">
+                    <span class="inline-block px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-white text-sm font-medium mb-6">
+                        <i data-lucide="sparkles" class="w-4 h-4 inline mr-2"></i>
+                        HKMU Data Science Program
+                    </span>
+                </div>
+                
+                <h1 class="animate-fade-in-up delay-100 text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
+                    Data Science Course Selection Guidance
+                </h1>
+                
+                <p class="animate-fade-in-up delay-200 text-lg sm:text-xl text-white/90 mb-8 max-w-2xl mx-auto">
+                    Your comprehensive companion for navigating the Data Science Bachelor's program at HKMU. Track progress, explore courses, read reviews, and plan your academic journey with confidence.
+                </p>
+                
+                <div class="animate-fade-in-up delay-300 flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="progress.html" class="btn-primary px-8 py-4 rounded-xl text-white font-semibold flex items-center justify-center gap-2">
+                        <i data-lucide="bar-chart-2" class="w-5 h-5"></i>
+                        View Progress
+                    </a>
+                    <a href="courses.html" class="btn-secondary px-8 py-4 rounded-xl font-semibold flex items-center justify-center gap-2">
+                        <i data-lucide="book-open" class="w-5 h-5"></i>
+                        Browse Courses
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Wave Bottom -->
+        <div class="absolute bottom-0 left-0 right-0">
+            <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M0 120L60 110C120 100 240 80 360 70C480 60 600 60 720 65C840 70 960 80 1080 85C1200 90 1320 90 1380 90L1440 90V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z" fill="#F5F7FA"/>
+            </svg>
+        </div>
+    </section>
+
+    <!-- Quick Stats Section -->
+    <section class="py-16 pattern-bg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="reveal">
+                <h2 class="text-2xl sm:text-3xl font-bold text-text-primary text-center mb-12">
+                    Program Overview
+                </h2>
+            </div>
+            
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Total Courses -->
+                <div class="reveal stat-card bg-white rounded-2xl p-6 shadow-md text-center">
+                    <div class="w-14 h-14 bg-hkmu-light-blue rounded-xl flex items-center justify-center mx-auto mb-4">
+                        <i data-lucide="book-open" class="w-7 h-7 text-hkmu-blue"></i>
+                    </div>
+                    <div class="text-3xl sm:text-4xl font-bold text-hkmu-blue mb-1 counter" data-target="35">0</div>
+                    <div class="text-text-secondary font-medium">Total Courses</div>
+                    <div class="text-sm text-text-muted mt-1">35+ available</div>
+                </div>
+                
+                <!-- Total Credits -->
+                <div class="reveal stat-card bg-white rounded-2xl p-6 shadow-md text-center" style="transition-delay: 0.1s;">
+                    <div class="w-14 h-14 bg-hkmu-light-green rounded-xl flex items-center justify-center mx-auto mb-4">
+                        <i data-lucide="award" class="w-7 h-7 text-hkmu-green"></i>
+                    </div>
+                    <div class="text-3xl sm:text-4xl font-bold text-hkmu-green mb-1 counter" data-target="120">0</div>
+                    <div class="text-text-secondary font-medium">Total Credits</div>
+                    <div class="text-sm text-text-muted mt-1">For graduation</div>
+                </div>
+                
+                <!-- Years -->
+                <div class="reveal stat-card bg-white rounded-2xl p-6 shadow-md text-center" style="transition-delay: 0.2s;">
+                    <div class="w-14 h-14 bg-orange-50 rounded-xl flex items-center justify-center mx-auto mb-4">
+                        <i data-lucide="calendar" class="w-7 h-7 text-warning-orange"></i>
+                    </div>
+                    <div class="text-3xl sm:text-4xl font-bold text-warning-orange mb-1 counter" data-target="4">0</div>
+                    <div class="text-text-secondary font-medium">Years</div>
+                    <div class="text-sm text-text-muted mt-1">Program duration</div>
+                </div>
+                
+                <!-- Categories -->
+                <div class="reveal stat-card bg-white rounded-2xl p-6 shadow-md text-center" style="transition-delay: 0.3s;">
+                    <div class="w-14 h-14 bg-purple-50 rounded-xl flex items-center justify-center mx-auto mb-4">
+                        <i data-lucide="layers" class="w-7 h-7 text-elective-purple"></i>
+                    </div>
+                    <div class="text-3xl sm:text-4xl font-bold text-elective-purple mb-1 counter" data-target="6">0</div>
+                    <div class="text-text-secondary font-medium">Categories</div>
+                    <div class="text-sm text-text-muted mt-1">Course types</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Feature Cards Section -->
+    <section class="py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="reveal text-center mb-12">
+                <h2 class="text-2xl sm:text-3xl font-bold text-text-primary mb-4">
+                    Everything You Need
+                </h2>
+                <p class="text-text-secondary max-w-2xl mx-auto">
+                    Our comprehensive platform provides all the tools you need to succeed in your Data Science journey
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Track Progress -->
+                <div class="reveal feature-card bg-white rounded-2xl p-6 shadow-md" style="transition-delay: 0s;">
+                    <div class="feature-icon w-14 h-14 bg-gradient-to-br from-hkmu-blue to-blue-600 rounded-xl flex items-center justify-center mb-5">
+                        <i data-lucide="bar-chart-2" class="w-7 h-7 text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-text-primary mb-3">Track Progress</h3>
+                    <p class="text-text-secondary mb-4">
+                        Monitor your degree completion with visual progress indicators and credit tracking across all categories.
+                    </p>
+                    <a href="progress.html" class="inline-flex items-center text-hkmu-blue font-semibold hover:underline">
+                        View Progress
+                        <i data-lucide="arrow-right" class="w-4 h-4 ml-1"></i>
+                    </a>
+                </div>
+                
+                <!-- Course Reviews -->
+                <div class="reveal feature-card bg-white rounded-2xl p-6 shadow-md" style="transition-delay: 0.1s;">
+                    <div class="feature-icon w-14 h-14 bg-gradient-to-br from-warning-orange to-orange-500 rounded-xl flex items-center justify-center mb-5">
+                        <i data-lucide="message-square" class="w-7 h-7 text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-text-primary mb-3">Course Reviews</h3>
+                    <p class="text-text-secondary mb-4">
+                        Read honest feedback from past students about course difficulty, workload, and teaching quality.
+                    </p>
+                    <a href="reviews.html" class="inline-flex items-center text-hkmu-blue font-semibold hover:underline">
+                        Read Reviews
+                        <i data-lucide="arrow-right" class="w-4 h-4 ml-1"></i>
+                    </a>
+                </div>
+                
+                <!-- Study Materials -->
+                <div class="reveal feature-card bg-white rounded-2xl p-6 shadow-md" style="transition-delay: 0.2s;">
+                    <div class="feature-icon w-14 h-14 bg-gradient-to-br from-hkmu-green to-green-600 rounded-xl flex items-center justify-center mb-5">
+                        <i data-lucide="folder-open" class="w-7 h-7 text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-text-primary mb-3">Study Materials</h3>
+                    <p class="text-text-secondary mb-4">
+                        Access shared notes, lecture slides, and resources contributed by fellow students.
+                    </p>
+                    <a href="materials.html" class="inline-flex items-center text-hkmu-blue font-semibold hover:underline">
+                        Browse Materials
+                        <i data-lucide="arrow-right" class="w-4 h-4 ml-1"></i>
+                    </a>
+                </div>
+                
+                <!-- Prerequisites -->
+                <div class="reveal feature-card bg-white rounded-2xl p-6 shadow-md" style="transition-delay: 0.3s;">
+                    <div class="feature-icon w-14 h-14 bg-gradient-to-br from-elective-purple to-purple-600 rounded-xl flex items-center justify-center mb-5">
+                        <i data-lucide="git-branch" class="w-7 h-7 text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-text-primary mb-3">Prerequisites</h3>
+                    <p class="text-text-secondary mb-4">
+                        Check course requirements and plan your academic path with clear prerequisite mappings.
+                    </p>
+                    <a href="courses.html" class="inline-flex items-center text-hkmu-blue font-semibold hover:underline">
+                        Explore Courses
+                        <i data-lucide="arrow-right" class="w-4 h-4 ml-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Getting Started Section -->
+    <section class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="reveal text-center mb-12">
+                <h2 class="text-2xl sm:text-3xl font-bold text-text-primary mb-4">
+                    Getting Started
+                </h2>
+                <p class="text-text-secondary max-w-2xl mx-auto">
+                    Follow these simple steps to make the most of the course selection guidance system
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Step 1 -->
+                <div class="reveal step-card bg-page-bg rounded-2xl p-6" style="transition-delay: 0s;">
+                    <div class="step-number w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-xl mb-4">
+                        1
+                    </div>
+                    <h3 class="text-lg font-bold text-text-primary mb-2">View Your Progress</h3>
+                    <p class="text-text-secondary text-sm">
+                        Check your current degree completion status and see how many credits you've earned.
+                    </p>
+                </div>
+                
+                <!-- Step 2 -->
+                <div class="reveal step-card bg-page-bg rounded-2xl p-6" style="transition-delay: 0.1s;">
+                    <div class="step-number w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-xl mb-4">
+                        2
+                    </div>
+                    <h3 class="text-lg font-bold text-text-primary mb-2">Browse Courses</h3>
+                    <p class="text-text-secondary text-sm">
+                        Explore all available courses organized by year, semester, and category.
+                    </p>
+                </div>
+                
+                <!-- Step 3 -->
+                <div class="reveal step-card bg-page-bg rounded-2xl p-6" style="transition-delay: 0.2s;">
+                    <div class="step-number w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-xl mb-4">
+                        3
+                    </div>
+                    <h3 class="text-lg font-bold text-text-primary mb-2">Read Reviews</h3>
+                    <p class="text-text-secondary text-sm">
+                        Learn from past students' experiences to make informed course selections.
+                    </p>
+                </div>
+                
+                <!-- Step 4 -->
+                <div class="reveal step-card bg-page-bg rounded-2xl p-6" style="transition-delay: 0.3s;">
+                    <div class="step-number w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-xl mb-4">
+                        4
+                    </div>
+                    <h3 class="text-lg font-bold text-text-primary mb-2">Download Materials</h3>
+                    <p class="text-text-secondary text-sm">
+                        Access study materials and resources shared by the student community.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quick Links Section -->
+    <section class="py-16 pattern-bg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="reveal text-center mb-12">
+                <h2 class="text-2xl sm:text-3xl font-bold text-text-primary mb-4">
+                    Quick Links
+                </h2>
+                <p class="text-text-secondary max-w-2xl mx-auto">
+                    Jump directly to the courses and categories you're interested in
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Year Links -->
+                <div class="reveal bg-white rounded-2xl p-6 shadow-md" style="transition-delay: 0s;">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-10 h-10 bg-hkmu-light-blue rounded-lg flex items-center justify-center">
+                            <i data-lucide="calendar" class="w-5 h-5 text-hkmu-blue"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-text-primary">Browse by Year</h3>
+                    </div>
+                    
+                    <div class="space-y-3">
+                        <a href="courses.html?year=1" class="quick-link flex items-center justify-between p-4 bg-page-bg rounded-xl">
+                            <div class="flex items-center gap-3">
+                                <span class="w-8 h-8 bg-hkmu-blue text-white rounded-lg flex items-center justify-center font-bold">1</span>
+                                <span class="font-medium text-text-primary">Year 1 Courses</span>
+                            </div>
+                            <i data-lucide="chevron-right" class="w-5 h-5 text-text-muted"></i>
+                        </a>
+                        
+                        <a href="courses.html?year=2" class="quick-link flex items-center justify-between p-4 bg-page-bg rounded-xl">
+                            <div class="flex items-center gap-3">
+                                <span class="w-8 h-8 bg-hkmu-green text-white rounded-lg flex items-center justify-center font-bold">2</span>
+                                <span class="font-medium text-text-primary">Year 2 Courses</span>
+                            </div>
+                            <i data-lucide="chevron-right" class="w-5 h-5 text-text-muted"></i>
+                        </a>
+                        
+                        <a href="courses.html?year=3" class="quick-link flex items-center justify-between p-4 bg-page-bg rounded-xl">
+                            <div class="flex items-center gap-3">
+                                <span class="w-8 h-8 bg-warning-orange text-white rounded-lg flex items-center justify-center font-bold">3</span>
+                                <span class="font-medium text-text-primary">Year 3 Courses</span>
+                            </div>
+                            <i data-lucide="chevron-right" class="w-5 h-5 text-text-muted"></i>
+                        </a>
+                        
+                        <a href="courses.html?year=4" class="quick-link flex items-center justify-between p-4 bg-page-bg rounded-xl">
+                            <div class="flex items-center gap-3">
+                                <span class="w-8 h-8 bg-elective-purple text-white rounded-lg flex items-center justify-center font-bold">4</span>
+                                <span class="font-medium text-text-primary">Year 4 Courses</span>
+                            </div>
+                            <i data-lucide="chevron-right" class="w-5 h-5 text-text-muted"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Category Links -->
+                <div class="reveal bg-white rounded-2xl p-6 shadow-md" style="transition-delay: 0.1s;">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-10 h-10 bg-hkmu-light-green rounded-lg flex items-center justify-center">
+                            <i data-lucide="layers" class="w-5 h-5 text-hkmu-green"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-text-primary">Browse by Category</h3>
+                    </div>
+                    
+                    <div class="space-y-3">
+                        <a href="courses.html?category=core" class="quick-link flex items-center justify-between p-4 bg-page-bg rounded-xl">
+                            <div class="flex items-center gap-3">
+                                <span class="w-3 h-3 bg-core-blue rounded-full"></span>
+                                <span class="font-medium text-text-primary">Core Courses</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-sm text-text-muted">84 credits</span>
+                                <i data-lucide="chevron-right" class="w-5 h-5 text-text-muted"></i>
+                            </div>
+                        </a>
+                        
+                        <a href="courses.html?category=elective" class="quick-link flex items-center justify-between p-4 bg-page-bg rounded-xl">
+                            <div class="flex items-center gap-3">
+                                <span class="w-3 h-3 bg-elective-purple rounded-full"></span>
+                                <span class="font-medium text-text-primary">Elective Courses</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-sm text-text-muted">12 credits</span>
+                                <i data-lucide="chevron-right" class="w-5 h-5 text-text-muted"></i>
+                            </div>
+                        </a>
+                        
+                        <a href="courses.html?category=project" class="quick-link flex items-center justify-between p-4 bg-page-bg rounded-xl">
+                            <div class="flex items-center gap-3">
+                                <span class="w-3 h-3 bg-project-amber rounded-full"></span>
+                                <span class="font-medium text-text-primary">Project Courses</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-sm text-text-muted">6 credits</span>
+                                <i data-lucide="chevron-right" class="w-5 h-5 text-text-muted"></i>
+                            </div>
+                        </a>
+                        
+                        <a href="courses.html?category=all" class="quick-link flex items-center justify-between p-4 bg-page-bg rounded-xl">
+                            <div class="flex items-center gap-3">
+                                <span class="w-3 h-3 bg-gradient-to-r from-core-blue via-elective-purple to-project-amber rounded-full"></span>
+                                <span class="font-medium text-text-primary">All Categories</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-sm text-text-muted">120 credits</span>
+                                <i data-lucide="chevron-right" class="w-5 h-5 text-text-muted"></i>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-16">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="reveal bg-gradient-to-r from-hkmu-blue to-hkmu-green rounded-3xl p-8 sm:p-12 text-center text-white">
+                <h2 class="text-2xl sm:text-3xl font-bold mb-4">
+                    Ready to Plan Your Academic Journey?
+                </h2>
+                <p class="text-white/90 mb-8 max-w-xl mx-auto">
+                    Start tracking your progress today and make informed decisions about your course selections.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="progress.html" class="bg-white text-hkmu-blue px-8 py-4 rounded-xl font-semibold hover:bg-gray-100 transition-colors flex items-center justify-center gap-2">
+                        <i data-lucide="rocket" class="w-5 h-5"></i>
+                        Get Started Now
+                    </a>
+                    <a href="courses.html" class="bg-white/20 backdrop-blur-sm text-white border-2 border-white/50 px-8 py-4 rounded-xl font-semibold hover:bg-white/30 transition-colors flex items-center justify-center gap-2">
+                        <i data-lucide="search" class="w-5 h-5"></i>
+                        Explore Courses
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-text-primary text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                <!-- Brand -->
+                <div class="md:col-span-2">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 bg-gradient-to-br from-hkmu-blue to-hkmu-green rounded-lg flex items-center justify-center">
+                            <i data-lucide="graduation-cap" class="w-6 h-6 text-white"></i>
+                        </div>
+                        <span class="text-xl font-bold">HKMU Data Science</span>
+                    </div>
+                    <p class="text-gray-400 max-w-md">
+                        Course Selection Guidance System for the Data Science Bachelor's program at Hong Kong Metropolitan University.
+                    </p>
+                </div>
+                
+                <!-- Quick Links -->
+                <div>
+                    <h4 class="font-semibold mb-4">Quick Links</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="progress.html" class="hover:text-white transition-colors">Degree Progress</a></li>
+                        <li><a href="courses.html" class="hover:text-white transition-colors">Browse Courses</a></li>
+                        <li><a href="reviews.html" class="hover:text-white transition-colors">Course Reviews</a></li>
+                        <li><a href="materials.html" class="hover:text-white transition-colors">Study Materials</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Resources -->
+                <div>
+                    <h4 class="font-semibold mb-4">Resources</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="https://www.hkmu.edu.hk" target="_blank" class="hover:text-white transition-colors">HKMU Website</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Academic Calendar</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Student Portal</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Help & Support</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-700 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+                <p class="text-gray-400 text-sm">
+                    &copy; 2024 HKMU Data Science Program. All rights reserved.
+                </p>
+                <div class="flex gap-6 text-sm text-gray-400">
+                    <a href="#" class="hover:text-white transition-colors">Privacy Policy</a>
+                    <a href="#" class="hover:text-white transition-colors">Terms of Use</a>
+                    <a href="#" class="hover:text-white transition-colors">Contact</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize Lucide Icons
+        document.addEventListener('DOMContentLoaded', function() {
+            lucide.createIcons();
+            
+            // Mobile Menu Toggle
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const closeMobileMenu = document.getElementById('closeMobileMenu');
+            const mobileMenu = document.getElementById('mobileMenu');
+            const mobileOverlay = document.getElementById('mobileOverlay');
+            
+            function openMobileMenu() {
+                mobileMenu.classList.add('open');
+                mobileOverlay.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+            
+            function closeMobileMenuFn() {
+                mobileMenu.classList.remove('open');
+                mobileOverlay.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+            
+            mobileMenuBtn.addEventListener('click', openMobileMenu);
+            closeMobileMenu.addEventListener('click', closeMobileMenuFn);
+            mobileOverlay.addEventListener('click', closeMobileMenuFn);
+            
+            // Counter Animation
+            const counters = document.querySelectorAll('.counter');
+            const counterObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const counter = entry.target;
+                        const target = parseInt(counter.getAttribute('data-target'));
+                        const duration = 1500;
+                        const step = target / (duration / 16);
+                        let current = 0;
+                        
+                        const updateCounter = () => {
+                            current += step;
+                            if (current < target) {
+                                counter.textContent = Math.floor(current) + '+';
+                                requestAnimationFrame(updateCounter);
+                            } else {
+                                counter.textContent = target + '+';
+                            }
+                        };
+                        
+                        updateCounter();
+                        counterObserver.unobserve(counter);
+                    }
+                });
+            }, { threshold: 0.5 });
+            
+            counters.forEach(counter => counterObserver.observe(counter));
+            
+            // Scroll Reveal Animation
+            const revealElements = document.querySelectorAll('.reveal');
+            const revealObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        revealObserver.unobserve(entry.target);
+                    }
+                });
+            }, { 
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            });
+            
+            revealElements.forEach(el => revealObserver.observe(el));
+            
+            // Smooth Scroll for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

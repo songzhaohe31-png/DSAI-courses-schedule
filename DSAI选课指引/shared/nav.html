@@ -1,0 +1,200 @@
+<!--
+  HKMU Course Selection Guidance System - Navigation Component
+  ============================================================
+  Include this navigation in all pages for consistent navigation.
+  
+  Usage:
+  Copy the entire <nav> element and its contents into your page.
+  Make sure to include the shared/scripts.js file for mobile menu functionality.
+  
+  Dependencies:
+  - Tailwind CSS v4
+  - Lucide Icons
+  - shared/styles.css
+  - shared/scripts.js (for mobile menu toggle)
+-->
+
+<!-- Navigation Bar -->
+<nav id="main-nav" class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200" style="height: var(--nav-height, 64px);">
+  <div class="container mx-auto h-full px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-full">
+      
+      <!-- Left: Logo & Brand -->
+      <a href="/" class="flex items-center gap-3 group">
+        <!-- HKMU Logo SVG -->
+        <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-[#0066CC] to-[#2E7D52]">
+          <span class="text-white font-bold text-lg">H</span>
+        </div>
+        <div class="hidden sm:block">
+          <span class="text-lg font-bold text-[#1A1A2E] group-hover:text-[#0066CC] transition-colors">HKMU</span>
+          <span class="text-sm text-[#6B7280] ml-1 hidden md:inline">Data Science Course Guide</span>
+        </div>
+      </a>
+      
+      <!-- Center: Desktop Navigation Links -->
+      <div class="hidden md:flex items-center gap-1">
+        <a href="/" 
+           class="nav-link flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-[#6B7280] hover:text-[#0066CC] hover:bg-[#E3F2FD] transition-all"
+           data-nav="home">
+          <i data-lucide="home" class="w-4 h-4"></i>
+          <span>Home</span>
+        </a>
+        <a href="/progress" 
+           class="nav-link flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-[#6B7280] hover:text-[#0066CC] hover:bg-[#E3F2FD] transition-all"
+           data-nav="progress">
+          <i data-lucide="bar-chart-2" class="w-4 h-4"></i>
+          <span>Progress</span>
+        </a>
+        <a href="/courses" 
+           class="nav-link flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-[#6B7280] hover:text-[#0066CC] hover:bg-[#E3F2FD] transition-all"
+           data-nav="courses">
+          <i data-lucide="book-open" class="w-4 h-4"></i>
+          <span>Courses</span>
+        </a>
+      </div>
+      
+      <!-- Right: Actions & Mobile Menu Button -->
+      <div class="flex items-center gap-2">
+        <!-- Search Button (Desktop) -->
+        <button 
+          type="button"
+          class="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-[#6B7280] hover:text-[#0066CC] hover:bg-[#E3F2FD] transition-all"
+          aria-label="Search courses">
+          <i data-lucide="search" class="w-4 h-4"></i>
+        </button>
+        
+        <!-- Mobile Menu Button -->
+        <button 
+          type="button"
+          id="mobile-menu-btn"
+          class="md:hidden flex items-center justify-center w-10 h-10 rounded-lg text-[#6B7280] hover:text-[#0066CC] hover:bg-[#E3F2FD] transition-all"
+          aria-label="Toggle menu"
+          aria-expanded="false"
+          aria-controls="mobile-menu">
+          <i data-lucide="menu" class="w-5 h-5" id="menu-icon-open"></i>
+          <i data-lucide="x" class="w-5 h-5 hidden" id="menu-icon-close"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Mobile Menu Drawer -->
+  <div 
+    id="mobile-menu"
+    class="md:hidden fixed inset-x-0 top-[var(--nav-height,64px)] bg-white border-b border-gray-200 shadow-lg transform -translate-y-full opacity-0 pointer-events-none transition-all duration-300 ease-out"
+    aria-hidden="true">
+    <div class="container mx-auto px-4 py-4">
+      <!-- Mobile Navigation Links -->
+      <div class="flex flex-col gap-1">
+        <a href="/" 
+           class="mobile-nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium text-[#1A1A2E] hover:text-[#0066CC] hover:bg-[#E3F2FD] transition-all"
+           data-nav="home">
+          <i data-lucide="home" class="w-5 h-5"></i>
+          <span>Home</span>
+        </a>
+        <a href="/progress" 
+           class="mobile-nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium text-[#1A1A2E] hover:text-[#0066CC] hover:bg-[#E3F2FD] transition-all"
+           data-nav="progress">
+          <i data-lucide="bar-chart-2" class="w-5 h-5"></i>
+          <span>Progress</span>
+        </a>
+        <a href="/courses" 
+           class="mobile-nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium text-[#1A1A2E] hover:text-[#0066CC] hover:bg-[#E3F2FD] transition-all"
+           data-nav="courses">
+          <i data-lucide="book-open" class="w-5 h-5"></i>
+          <span>Courses</span>
+        </a>
+      </div>
+      
+      <!-- Mobile Divider -->
+      <div class="my-4 border-t border-gray-200"></div>
+      
+      <!-- Mobile Quick Actions -->
+      <div class="flex flex-col gap-1">
+        <button 
+          type="button"
+          class="flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium text-[#6B7280] hover:text-[#0066CC] hover:bg-[#E3F2FD] transition-all text-left">
+          <i data-lucide="search" class="w-5 h-5"></i>
+          <span>Search Courses</span>
+        </button>
+        <button 
+          type="button"
+          class="flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium text-[#6B7280] hover:text-[#0066CC] hover:bg-[#E3F2FD] transition-all text-left">
+          <i data-lucide="settings" class="w-5 h-5"></i>
+          <span>Settings</span>
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Mobile Menu Overlay -->
+  <div 
+    id="mobile-menu-overlay"
+    class="md:hidden fixed inset-0 bg-black/20 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300"
+    aria-hidden="true"
+    style="top: var(--nav-height, 64px);">
+  </div>
+</nav>
+
+<!-- Spacer for fixed navigation -->
+<div style="height: var(--nav-height, 64px);" aria-hidden="true"></div>
+
+<!--
+  Navigation Styling (inline for easy customization)
+  These styles complement the shared/styles.css
+-->
+<style>
+  /* Active Navigation Link State */
+  .nav-link.active,
+  .mobile-nav-link.active {
+    color: var(--hkmu-blue, #0066CC) !important;
+    background-color: var(--hkmu-blue-light, #E3F2FD) !important;
+    font-weight: 600;
+  }
+  
+  .nav-link.active::after,
+  .mobile-nav-link.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: var(--hkmu-blue, #0066CC);
+    border-radius: 2px;
+  }
+  
+  /* Mobile Menu Open State */
+  #mobile-menu.is-open {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+  
+  #mobile-menu-overlay.is-visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  
+  /* Navigation Link Positioning */
+  .nav-link {
+    position: relative;
+  }
+  
+  /* Smooth scroll offset for fixed nav */
+  html {
+    scroll-padding-top: calc(var(--nav-height, 64px) + 16px);
+  }
+  
+  /* Focus styles for accessibility */
+  .nav-link:focus-visible,
+  .mobile-nav-link:focus-visible {
+    outline: 2px solid var(--hkmu-blue, #0066CC);
+    outline-offset: 2px;
+  }
+  
+  /* Logo hover effect */
+  .group:hover .group-hover\:text-\[\#0066CC\] {
+    color: var(--hkmu-blue, #0066CC);
+  }
+</style>

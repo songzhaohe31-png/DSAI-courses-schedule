@@ -1,0 +1,1464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Course Details | HKMU Data Science</title>
+  
+  <!-- Google Fonts - Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS v4 -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'hkmu-blue': '#0066CC',
+            'hkmu-green': '#2E7D52',
+            'success-green': '#4CAF50',
+            'warning-orange': '#FF9800',
+            'info-blue': '#2196F3',
+            'locked-gray': '#9E9E9E',
+            'text-primary': '#1A1A2E',
+            'text-secondary': '#6B7280',
+            'text-muted': '#9CA3AF',
+            'page-bg': '#F5F7FA',
+            'card-bg': '#FFFFFF',
+            'light-blue': '#E3F2FD',
+            'light-green': '#E8F5E9',
+            'core': '#0066CC',
+            'elective': '#7C3AED',
+            'project': '#F59E0B',
+            'english': '#10B981',
+            'general': '#EC4899',
+            'university': '#6366F1',
+          },
+          fontFamily: {
+            sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+            mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
+          },
+        }
+      }
+    }
+  </script>
+  
+  <style>
+    /* Base Styles */
+    * {
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #F5F7FA;
+      color: #1A1A2E;
+    }
+    
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes slideInBottom {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes slideInModal {
+      from { opacity: 0; transform: translateY(100%) scale(0.95); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    
+    @keyframes slideOutModal {
+      from { opacity: 1; transform: translateY(0) scale(1); }
+      to { opacity: 0; transform: translateY(100%) scale(0.95); }
+    }
+    
+    @keyframes progressFill {
+      from { width: 0%; }
+      to { width: var(--progress); }
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+    
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+    
+    .animate-fade-in {
+      animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+    
+    .animate-slide-in {
+      animation: slideInBottom 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+    
+    .animate-modal-in {
+      animation: slideInModal 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+    
+    .animate-modal-out {
+      animation: slideOutModal 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+    
+    /* Stagger animations */
+    .stagger-1 { animation-delay: 0s; }
+    .stagger-2 { animation-delay: 0.1s; }
+    .stagger-3 { animation-delay: 0.2s; }
+    .stagger-4 { animation-delay: 0.3s; }
+    .stagger-5 { animation-delay: 0.4s; }
+    
+    /* Card hover effects */
+    .card-hover {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .card-hover:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+    
+    /* Button effects */
+    .btn-hover {
+      transition: all 0.2s ease-in-out;
+    }
+    
+    .btn-hover:hover {
+      transform: scale(1.02);
+    }
+    
+    .btn-hover:active {
+      transform: scale(0.98);
+    }
+    
+    /* Star rating */
+    .star-rating {
+      display: flex;
+      gap: 4px;
+    }
+    
+    .star {
+      cursor: pointer;
+      transition: transform 0.15s ease;
+    }
+    
+    .star:hover {
+      transform: scale(1.2);
+    }
+    
+    .star.filled {
+      color: #F59E0B;
+    }
+    
+    .star.empty {
+      color: #D1D5DB;
+    }
+    
+    /* Tab styles */
+    .tab-btn {
+      position: relative;
+      transition: all 0.2s ease;
+    }
+    
+    .tab-btn::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background-color: #0066CC;
+      transform: scaleX(0);
+      transition: transform 0.2s ease;
+    }
+    
+    .tab-btn.active::after {
+      transform: scaleX(1);
+    }
+    
+    .tab-btn.active {
+      color: #0066CC;
+      font-weight: 600;
+    }
+    
+    /* Drag and drop zone */
+    .drop-zone {
+      border: 2px dashed #D1D5DB;
+      transition: all 0.2s ease;
+    }
+    
+    .drop-zone.drag-over {
+      border-color: #0066CC;
+      background-color: #E3F2FD;
+    }
+    
+    /* Progress bar */
+    .progress-bar {
+      background: linear-gradient(90deg, #0066CC, #2E7D52);
+      animation: progressFill 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+    
+    /* Status badges */
+    .status-completed {
+      background-color: #E8F5E9;
+      color: #2E7D52;
+    }
+    
+    .status-in-progress {
+      background-color: #FFF3E0;
+      color: #E65100;
+    }
+    
+    .status-available {
+      background-color: #E3F2FD;
+      color: #1565C0;
+    }
+    
+    .status-locked {
+      background-color: #F5F5F5;
+      color: #616161;
+    }
+    
+    /* Modal overlay */
+    .modal-overlay {
+      background-color: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+    }
+    
+    /* File type icons */
+    .file-icon-pdf { color: #DC2626; }
+    .file-icon-doc { color: #2563EB; }
+    .file-icon-ppt { color: #EA580C; }
+    .file-icon-zip { color: #7C3AED; }
+    .file-icon-default { color: #6B7280; }
+    
+    /* Scrollbar styling */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: #F1F1F1;
+      border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: #C1C1C1;
+      border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: #A1A1A1;
+    }
+    
+    /* Mobile menu */
+    .mobile-menu {
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+    }
+    
+    .mobile-menu.open {
+      transform: translateX(0);
+    }
+    
+    /* Category badges */
+    .badge-core { background-color: #E3F2FD; color: #0066CC; }
+    .badge-elective { background-color: #EDE9FE; color: #7C3AED; }
+    .badge-project { background-color: #FEF3C7; color: #D97706; }
+    .badge-english { background-color: #D1FAE5; color: #059669; }
+    .badge-general { background-color: #FCE7F3; color: #DB2777; }
+    .badge-university { background-color: #E0E7FF; color: #4F46E5; }
+    
+    /* Toast notification */
+    .toast {
+      animation: slideInBottom 0.3s ease forwards;
+    }
+    
+    .toast.hide {
+      animation: fadeIn 0.3s ease reverse forwards;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-page-bg">
+  <!-- Navigation Header -->
+  <header class="bg-white shadow-sm sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <!-- Logo -->
+        <div class="flex items-center gap-3">
+          <a href="/progress.html" class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-hkmu-blue rounded-lg flex items-center justify-center">
+              <i data-lucide="graduation-cap" class="w-6 h-6 text-white"></i>
+            </div>
+            <div class="hidden sm:block">
+              <span class="text-lg font-bold text-text-primary">HKMU</span>
+              <span class="text-sm text-text-secondary ml-1">Data Science</span>
+            </div>
+          </a>
+        </div>
+        
+        <!-- Desktop Navigation -->
+        <nav class="hidden md:flex items-center gap-6">
+          <a href="/progress.html" class="text-text-secondary hover:text-hkmu-blue transition-colors font-medium">Degree Progress</a>
+          <a href="/course-detail.html?id=COMP1080SEF" class="text-hkmu-blue font-semibold border-b-2 border-hkmu-blue pb-1">Course Detail</a>
+        </nav>
+        
+        <!-- Mobile Menu Button -->
+        <button id="mobileMenuBtn" class="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors">
+          <i data-lucide="menu" class="w-6 h-6 text-text-primary"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+  
+  <!-- Mobile Menu -->
+  <div id="mobileMenu" class="mobile-menu fixed inset-y-0 right-0 w-64 bg-white shadow-xl z-50 md:hidden">
+    <div class="p-4 border-b flex justify-between items-center">
+      <span class="font-semibold text-text-primary">Menu</span>
+      <button id="closeMobileMenu" class="p-2 rounded-lg hover:bg-gray-100">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+    </div>
+    <nav class="p-4 flex flex-col gap-2">
+      <a href="/progress.html" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-100 text-text-secondary">
+        <i data-lucide="bar-chart-2" class="w-5 h-5"></i>
+        <span>Degree Progress</span>
+      </a>
+      <a href="/course-detail.html?id=COMP1080SEF" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-light-blue text-hkmu-blue font-medium">
+        <i data-lucide="book-open" class="w-5 h-5"></i>
+        <span>Course Detail</span>
+      </a>
+    </nav>
+  </div>
+  
+  <!-- Mobile Menu Overlay -->
+  <div id="mobileMenuOverlay" class="fixed inset-0 bg-black/50 z-40 hidden md:hidden"></div>
+
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Breadcrumbs -->
+    <nav class="flex items-center gap-2 text-sm mb-6 animate-fade-in">
+      <a href="/progress.html" class="text-text-secondary hover:text-hkmu-blue transition-colors">Progress</a>
+      <i data-lucide="chevron-right" class="w-4 h-4 text-text-muted"></i>
+      <span id="breadcrumbCourseCode" class="text-text-primary font-medium">COMP 1080SEF</span>
+    </nav>
+    
+    <!-- Course Header Section -->
+    <section class="bg-white rounded-2xl shadow-md p-6 sm:p-8 mb-6 animate-slide-in stagger-1 opacity-0">
+      <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
+        <!-- Left: Course Info -->
+        <div class="flex-1">
+          <!-- Status Badge -->
+          <div id="statusBadge" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium status-available mb-4">
+            <i data-lucide="circle" class="w-4 h-4"></i>
+            <span id="statusText">Available</span>
+          </div>
+          
+          <!-- Course Code & Title -->
+          <h1 id="courseCode" class="text-3xl sm:text-4xl font-bold text-text-primary mb-2 font-mono">COMP 1080SEF</h1>
+          <h2 id="courseTitle" class="text-xl sm:text-2xl font-semibold text-text-secondary mb-4">Introduction to Computer Programming</h2>
+          
+          <!-- Badges Row -->
+          <div class="flex flex-wrap items-center gap-3">
+            <span id="categoryBadge" class="badge-core px-3 py-1.5 rounded-full text-sm font-medium">Core</span>
+            <span class="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 rounded-full text-sm text-text-secondary">
+              <i data-lucide="award" class="w-4 h-4"></i>
+              <span id="creditsBadge">3 Credits</span>
+            </span>
+            <span class="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 rounded-full text-sm text-text-secondary">
+              <i data-lucide="calendar" class="w-4 h-4"></i>
+              <span id="semesterBadge">Year 1, Autumn</span>
+            </span>
+            <span id="levelBadge" class="px-3 py-1.5 bg-hkmu-green/10 text-hkmu-green rounded-full text-sm font-medium">Foundation</span>
+          </div>
+        </div>
+        
+        <!-- Right: Status Actions -->
+        <div class="flex flex-col gap-3 lg:items-end">
+          <span class="text-sm text-text-muted mb-1">Update Course Status</span>
+          <div class="flex flex-wrap gap-2">
+            <button onclick="updateStatus('completed')" class="btn-hover flex items-center gap-2 px-4 py-2 bg-success-green text-white rounded-lg font-medium hover:bg-green-600 transition-colors">
+              <i data-lucide="check-circle" class="w-4 h-4"></i>
+              <span>Mark Completed</span>
+            </button>
+            <button onclick="updateStatus('in-progress')" class="btn-hover flex items-center gap-2 px-4 py-2 bg-warning-orange text-white rounded-lg font-medium hover:bg-orange-600 transition-colors">
+              <i data-lucide="clock" class="w-4 h-4"></i>
+              <span>In Progress</span>
+            </button>
+            <button onclick="updateStatus('available')" class="btn-hover flex items-center gap-2 px-4 py-2 bg-gray-200 text-text-secondary rounded-lg font-medium hover:bg-gray-300 transition-colors">
+              <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+              <span>Reset</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Course Info & Tabs Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Left Column: Course Info -->
+      <div class="lg:col-span-1 space-y-6">
+        <!-- Course Description Card -->
+        <section class="bg-white rounded-2xl shadow-md p-6 animate-slide-in stagger-2 opacity-0">
+          <h3 class="text-lg font-semibold text-text-primary mb-4 flex items-center gap-2">
+            <i data-lucide="info" class="w-5 h-5 text-hkmu-blue"></i>
+            Course Information
+          </h3>
+          
+          <div class="space-y-4">
+            <div>
+              <h4 class="text-sm font-medium text-text-muted mb-1">Description</h4>
+              <p id="courseDescription" class="text-text-secondary text-sm leading-relaxed">
+                This is intended to be a first course in computer programming. In this course, students will study how to write computer programs in the Python language to solve simple computing problems.
+              </p>
+            </div>
+            
+            <div>
+              <h4 class="text-sm font-medium text-text-muted mb-2">Learning Outcomes</h4>
+              <ul id="learningOutcomes" class="space-y-2">
+                <li class="flex items-start gap-2 text-sm text-text-secondary">
+                  <i data-lucide="check" class="w-4 h-4 text-hkmu-green mt-0.5 flex-shrink-0"></i>
+                  <span>Understand fundamental programming concepts</span>
+                </li>
+                <li class="flex items-start gap-2 text-sm text-text-secondary">
+                  <i data-lucide="check" class="w-4 h-4 text-hkmu-green mt-0.5 flex-shrink-0"></i>
+                  <span>Write Python programs to solve problems</span>
+                </li>
+                <li class="flex items-start gap-2 text-sm text-text-secondary">
+                  <i data-lucide="check" class="w-4 h-4 text-hkmu-green mt-0.5 flex-shrink-0"></i>
+                  <span>Apply algorithmic thinking to real-world scenarios</span>
+                </li>
+              </ul>
+            </div>
+            
+            <div>
+              <h4 class="text-sm font-medium text-text-muted mb-1">Prerequisites</h4>
+              <p id="prerequisites" class="text-text-secondary text-sm">None</p>
+            </div>
+            
+            <div class="pt-4 border-t">
+              <div class="flex items-center justify-between text-sm">
+                <span class="text-text-muted">Course Category</span>
+                <span id="infoCategory" class="font-medium text-hkmu-blue">Core Course</span>
+              </div>
+              <div class="flex items-center justify-between text-sm mt-2">
+                <span class="text-text-muted">Credit Value</span>
+                <span id="infoCredits" class="font-medium text-text-primary">3 credits</span>
+              </div>
+            </div>
+          </div>
+        </section>
+        
+        <!-- Related Courses -->
+        <section class="bg-white rounded-2xl shadow-md p-6 animate-slide-in stagger-3 opacity-0">
+          <h3 class="text-lg font-semibold text-text-primary mb-4 flex items-center gap-2">
+            <i data-lucide="link" class="w-5 h-5 text-hkmu-blue"></i>
+            Related Courses
+          </h3>
+          
+          <div id="relatedCourses" class="space-y-3">
+            <!-- Related courses will be populated by JS -->
+          </div>
+        </section>
+      </div>
+      
+      <!-- Right Column: Tabs Content -->
+      <div class="lg:col-span-2">
+        <!-- Tabs Navigation -->
+        <div class="bg-white rounded-t-2xl shadow-md border-b px-6 pt-4 animate-slide-in stagger-2 opacity-0">
+          <div class="flex gap-6">
+            <button id="reviewsTab" class="tab-btn active pb-4 text-sm font-medium text-text-secondary hover:text-hkmu-blue" onclick="switchTab('reviews')">
+              <span class="flex items-center gap-2">
+                <i data-lucide="message-square" class="w-4 h-4"></i>
+                Reviews
+                <span id="reviewCount" class="bg-hkmu-blue text-white text-xs px-2 py-0.5 rounded-full">3</span>
+              </span>
+            </button>
+            <button id="materialsTab" class="tab-btn pb-4 text-sm font-medium text-text-secondary hover:text-hkmu-blue" onclick="switchTab('materials')">
+              <span class="flex items-center gap-2">
+                <i data-lucide="file-text" class="w-4 h-4"></i>
+                Materials
+                <span id="materialCount" class="bg-gray-200 text-text-secondary text-xs px-2 py-0.5 rounded-full">3</span>
+              </span>
+            </button>
+          </div>
+        </div>
+        
+        <!-- Tab Content Container -->
+        <div class="bg-white rounded-b-2xl shadow-md p-6 animate-slide-in stagger-3 opacity-0 min-h-[400px]">
+          <!-- Reviews Tab Content -->
+          <div id="reviewsContent" class="tab-content">
+            <!-- Reviews Header -->
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+              <div>
+                <h3 class="text-lg font-semibold text-text-primary">Student Reviews</h3>
+                <p class="text-sm text-text-muted">See what other students think about this course</p>
+              </div>
+              <button onclick="openReviewModal()" class="btn-hover flex items-center justify-center gap-2 px-4 py-2 bg-hkmu-blue text-white rounded-lg font-medium hover:bg-blue-700 transition-colors">
+                <i data-lucide="plus" class="w-4 h-4"></i>
+                <span>Add Review</span>
+              </button>
+            </div>
+            
+            <!-- Reviews List -->
+            <div id="reviewsList" class="space-y-4">
+              <!-- Reviews will be populated by JS -->
+            </div>
+          </div>
+          
+          <!-- Materials Tab Content -->
+          <div id="materialsContent" class="tab-content hidden">
+            <!-- Materials Header -->
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+              <div>
+                <h3 class="text-lg font-semibold text-text-primary">Course Materials</h3>
+                <p class="text-sm text-text-muted">Study materials shared by students</p>
+              </div>
+              <button onclick="openUploadModal()" class="btn-hover flex items-center justify-center gap-2 px-4 py-2 bg-hkmu-green text-white rounded-lg font-medium hover:bg-green-700 transition-colors">
+                <i data-lucide="upload" class="w-4 h-4"></i>
+                <span>Upload File</span>
+              </button>
+            </div>
+            
+            <!-- Materials List -->
+            <div id="materialsList" class="space-y-3">
+              <!-- Materials will be populated by JS -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t mt-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 bg-hkmu-blue rounded-lg flex items-center justify-center">
+            <i data-lucide="graduation-cap" class="w-4 h-4 text-white"></i>
+          </div>
+          <span class="text-sm text-text-secondary">HKMU Data Science Program</span>
+        </div>
+        <div class="flex items-center gap-6 text-sm text-text-muted">
+          <a href="#" class="hover:text-hkmu-blue transition-colors">Privacy Policy</a>
+          <a href="#" class="hover:text-hkmu-blue transition-colors">Terms of Use</a>
+          <a href="#" class="hover:text-hkmu-blue transition-colors">Contact</a>
+        </div>
+        <p class="text-sm text-text-muted">2024 HKMU. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Add Review Modal -->
+  <div id="reviewModal" class="fixed inset-0 z-50 hidden">
+    <div class="modal-overlay absolute inset-0" onclick="closeReviewModal()"></div>
+    <div class="absolute inset-x-0 bottom-0 sm:inset-0 sm:flex sm:items-center sm:justify-center p-4">
+      <div class="modal-content bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+        <div class="p-6 border-b flex items-center justify-between">
+          <h3 class="text-xl font-semibold text-text-primary">Write a Review</h3>
+          <button onclick="closeReviewModal()" class="p-2 rounded-lg hover:bg-gray-100 transition-colors">
+            <i data-lucide="x" class="w-5 h-5 text-text-secondary"></i>
+          </button>
+        </div>
+        
+        <form id="reviewForm" class="p-6 space-y-5">
+          <!-- Rating -->
+          <div>
+            <label class="block text-sm font-medium text-text-primary mb-2">Your Rating</label>
+            <div id="ratingSelector" class="star-rating">
+              <button type="button" class="star empty" data-rating="1" onclick="setRating(1)">
+                <i data-lucide="star" class="w-8 h-8 fill-current"></i>
+              </button>
+              <button type="button" class="star empty" data-rating="2" onclick="setRating(2)">
+                <i data-lucide="star" class="w-8 h-8 fill-current"></i>
+              </button>
+              <button type="button" class="star empty" data-rating="3" onclick="setRating(3)">
+                <i data-lucide="star" class="w-8 h-8 fill-current"></i>
+              </button>
+              <button type="button" class="star empty" data-rating="4" onclick="setRating(4)">
+                <i data-lucide="star" class="w-8 h-8 fill-current"></i>
+              </button>
+              <button type="button" class="star empty" data-rating="5" onclick="setRating(5)">
+                <i data-lucide="star" class="w-8 h-8 fill-current"></i>
+              </button>
+            </div>
+            <input type="hidden" id="ratingInput" value="0" required>
+            <p id="ratingError" class="text-red-500 text-sm mt-1 hidden">Please select a rating</p>
+          </div>
+          
+          <!-- Name -->
+          <div>
+            <label for="reviewerName" class="block text-sm font-medium text-text-primary mb-1">Your Name</label>
+            <input type="text" id="reviewerName" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-hkmu-blue focus:border-transparent outline-none transition-all" placeholder="Enter your name" required>
+          </div>
+          
+          <!-- Semester -->
+          <div>
+            <label for="semesterTaken" class="block text-sm font-medium text-text-primary mb-1">Semester Taken</label>
+            <select id="semesterTaken" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-hkmu-blue focus:border-transparent outline-none transition-all" required>
+              <option value="">Select semester</option>
+              <option value="2024 Autumn">2024 Autumn</option>
+              <option value="2024 Spring">2024 Spring</option>
+              <option value="2023 Autumn">2023 Autumn</option>
+              <option value="2023 Spring">2023 Spring</option>
+              <option value="2022 Autumn">2022 Autumn</option>
+              <option value="2022 Spring">2022 Spring</option>
+            </select>
+          </div>
+          
+          <!-- Review Text -->
+          <div>
+            <label for="reviewText" class="block text-sm font-medium text-text-primary mb-1">Your Review</label>
+            <textarea id="reviewText" rows="4" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-hkmu-blue focus:border-transparent outline-none transition-all resize-none" placeholder="Share your experience with this course..." minlength="20" maxlength="1000" required></textarea>
+            <p class="text-xs text-text-muted mt-1">Minimum 20 characters</p>
+          </div>
+          
+          <!-- Anonymous Checkbox -->
+          <div class="flex items-center gap-2">
+            <input type="checkbox" id="anonymousReview" class="w-4 h-4 text-hkmu-blue rounded border-gray-300 focus:ring-hkmu-blue">
+            <label for="anonymousReview" class="text-sm text-text-secondary">Post anonymously</label>
+          </div>
+          
+          <!-- Submit Button -->
+          <button type="submit" class="btn-hover w-full flex items-center justify-center gap-2 px-4 py-3 bg-hkmu-blue text-white rounded-lg font-medium hover:bg-blue-700 transition-colors">
+            <i data-lucide="send" class="w-4 h-4"></i>
+            <span>Submit Review</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Upload File Modal -->
+  <div id="uploadModal" class="fixed inset-0 z-50 hidden">
+    <div class="modal-overlay absolute inset-0" onclick="closeUploadModal()"></div>
+    <div class="absolute inset-x-0 bottom-0 sm:inset-0 sm:flex sm:items-center sm:justify-center p-4">
+      <div class="modal-content bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+        <div class="p-6 border-b flex items-center justify-between">
+          <h3 class="text-xl font-semibold text-text-primary">Upload Material</h3>
+          <button onclick="closeUploadModal()" class="p-2 rounded-lg hover:bg-gray-100 transition-colors">
+            <i data-lucide="x" class="w-5 h-5 text-text-secondary"></i>
+          </button>
+        </div>
+        
+        <form id="uploadForm" class="p-6 space-y-5">
+          <!-- Drop Zone -->
+          <div>
+            <label class="block text-sm font-medium text-text-primary mb-2">Select File</label>
+            <div id="dropZone" class="drop-zone rounded-xl p-8 text-center cursor-pointer">
+              <input type="file" id="fileInput" class="hidden" accept=".pdf,.doc,.docx,.ppt,.pptx,.zip">
+              <div id="uploadPrompt">
+                <div class="w-16 h-16 bg-light-blue rounded-full flex items-center justify-center mx-auto mb-4">
+                  <i data-lucide="upload-cloud" class="w-8 h-8 text-hkmu-blue"></i>
+                </div>
+                <p class="text-text-primary font-medium mb-1">Drag and drop your file here</p>
+                <p class="text-sm text-text-muted mb-3">or click to browse</p>
+                <p class="text-xs text-text-muted">Supported: PDF, DOC, DOCX, PPT, PPTX, ZIP (max 50MB)</p>
+              </div>
+              <div id="filePreview" class="hidden">
+                <div class="w-16 h-16 bg-light-green rounded-full flex items-center justify-center mx-auto mb-4">
+                  <i data-lucide="file-check" class="w-8 h-8 text-hkmu-green"></i>
+                </div>
+                <p id="selectedFileName" class="text-text-primary font-medium mb-1"></p>
+                <p id="selectedFileSize" class="text-sm text-text-muted"></p>
+                <button type="button" onclick="clearFileSelection()" class="mt-3 text-sm text-red-500 hover:text-red-600">Remove file</button>
+              </div>
+            </div>
+            <!-- Progress Bar (hidden by default) -->
+            <div id="uploadProgress" class="hidden mt-4">
+              <div class="flex items-center justify-between text-sm mb-1">
+                <span class="text-text-secondary">Uploading...</span>
+                <span id="progressPercent" class="text-hkmu-blue font-medium">0%</span>
+              </div>
+              <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+                <div id="progressBar" class="h-full bg-hkmu-blue rounded-full transition-all duration-300" style="width: 0%"></div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Description -->
+          <div>
+            <label for="fileDescription" class="block text-sm font-medium text-text-primary mb-1">Description (Optional)</label>
+            <input type="text" id="fileDescription" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-hkmu-blue focus:border-transparent outline-none transition-all" placeholder="e.g., Lecture notes for weeks 1-5">
+          </div>
+          
+          <!-- Uploader Name -->
+          <div>
+            <label for="uploaderName" class="block text-sm font-medium text-text-primary mb-1">Your Name</label>
+            <input type="text" id="uploaderName" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-hkmu-blue focus:border-transparent outline-none transition-all" placeholder="Enter your name" required>
+          </div>
+          
+          <!-- Submit Button -->
+          <button type="submit" id="uploadSubmitBtn" class="btn-hover w-full flex items-center justify-center gap-2 px-4 py-3 bg-hkmu-green text-white rounded-lg font-medium hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+            <i data-lucide="upload" class="w-4 h-4"></i>
+            <span>Upload File</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toastContainer" class="fixed bottom-4 right-4 z-50 space-y-2"></div>
+
+  <script>
+    // Initialize Lucide icons
+    lucide.createIcons();
+    
+    // ==================== DATA ====================
+    
+    // Course data
+    const courseData = {
+      id: 'COMP1080SEF',
+      code: 'COMP 1080SEF',
+      title: 'Introduction to Computer Programming',
+      credits: 3,
+      category: 'core',
+      categoryName: 'Core',
+      level: 'Foundation',
+      year: 1,
+      semester: 'autumn',
+      semesterDisplay: 'Year 1, Autumn',
+      description: 'This is intended to be a first course in computer programming. In this course, students will study how to write computer programs in the Python language to solve simple computing problems.',
+      prerequisites: [],
+      learningOutcomes: [
+        'Understand fundamental programming concepts',
+        'Write Python programs to solve problems',
+        'Apply algorithmic thinking to real-world scenarios'
+      ],
+      status: 'available'
+    };
+    
+    // Reviews data
+    let reviews = [
+      {
+        id: 'rev_001',
+        author: 'Sarah Chen',
+        authorYear: 3,
+        semester: '2023 Autumn',
+        rating: 5,
+        content: 'Great introductory course! Professor explains concepts clearly. The labs are very helpful for practicing what you learn in lectures. Highly recommend for anyone new to programming.',
+        helpfulCount: 24,
+        createdAt: '2024-01-15T10:30:00Z',
+        isAnonymous: false
+      },
+      {
+        id: 'rev_002',
+        author: 'Michael Wong',
+        authorYear: 2,
+        semester: '2024 Spring',
+        rating: 4,
+        content: 'Challenging but rewarding. Make sure to practice the exercises regularly. The assignments can be tough but they really help solidify your understanding.',
+        helpfulCount: 18,
+        createdAt: '2024-02-20T14:22:00Z',
+        isAnonymous: false
+      },
+      {
+        id: 'rev_003',
+        author: 'Emily Liu',
+        authorYear: 4,
+        semester: '2022 Autumn',
+        rating: 5,
+        content: 'Good foundation for programming. Labs are helpful and TAs are supportive. This course set me up well for all the advanced programming courses that followed.',
+        helpfulCount: 31,
+        createdAt: '2023-01-10T09:15:00Z',
+        isAnonymous: false
+      }
+    ];
+    
+    // Materials data
+    let materials = [
+      {
+        id: 'mat_001',
+        filename: 'Lecture_Notes_Week_1-5.pdf',
+        originalName: 'Lecture Notes Week 1-5.pdf',
+        fileSize: 2411724,
+        fileType: 'application/pdf',
+        description: 'Complete lecture notes for weeks 1-5 including examples',
+        uploadedBy: 'David Park',
+        downloadCount: 156,
+        createdAt: '2024-01-20T14:22:00Z'
+      },
+      {
+        id: 'mat_002',
+        filename: 'Assignment_Solutions.zip',
+        originalName: 'Assignment Solutions.zip',
+        fileSize: 1153433,
+        fileType: 'application/zip',
+        description: 'Solutions for all assignments with explanations',
+        uploadedBy: 'Lisa Zhang',
+        downloadCount: 89,
+        createdAt: '2024-02-05T11:30:00Z'
+      },
+      {
+        id: 'mat_003',
+        filename: 'Study_Guide.pdf',
+        originalName: 'Study Guide.pdf',
+        fileSize: 876544,
+        fileType: 'application/pdf',
+        description: 'Comprehensive study guide for final exam preparation',
+        uploadedBy: 'James Lee',
+        downloadCount: 203,
+        createdAt: '2024-03-01T16:45:00Z'
+      }
+    ];
+    
+    // Related courses
+    const relatedCourses = [
+      {
+        id: 'COMP2090SEF',
+        code: 'COMP 2090SEF',
+        title: 'Data Structures, Algorithms & Problem Solving',
+        credits: 3,
+        category: 'core',
+        categoryName: 'Core',
+        status: 'locked'
+      },
+      {
+        id: 'COMP2020SEF',
+        code: 'COMP 2020SEF',
+        title: 'Java Programming Fundamentals',
+        credits: 3,
+        category: 'core',
+        categoryName: 'Core',
+        status: 'locked'
+      },
+      {
+        id: 'IT1020SEF',
+        code: 'IT 1020SEF',
+        title: 'Computing Fundamentals',
+        credits: 3,
+        category: 'core',
+        categoryName: 'Core',
+        status: 'available'
+      },
+      {
+        id: 'MATH1410SEF',
+        code: 'MATH 1410SEF',
+        title: 'Algebra and Calculus',
+        credits: 3,
+        category: 'core',
+        categoryName: 'Core',
+        status: 'available'
+      }
+    ];
+    
+    // Current rating for review form
+    let currentRating = 0;
+    
+    // Selected file for upload
+    let selectedFile = null;
+    
+    // ==================== INITIALIZATION ====================
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      // Parse URL parameters
+      const urlParams = new URLSearchParams(window.location.search);
+      const courseId = urlParams.get('id') || 'COMP1080SEF';
+      
+      // Initialize page
+      initializePage();
+      renderReviews();
+      renderMaterials();
+      renderRelatedCourses();
+      
+      // Setup mobile menu
+      setupMobileMenu();
+      
+      // Setup drag and drop
+      setupDragAndDrop();
+      
+      // Setup form submissions
+      setupForms();
+    });
+    
+    function initializePage() {
+      // Set course info
+      document.getElementById('courseCode').textContent = courseData.code;
+      document.getElementById('courseTitle').textContent = courseData.title;
+      document.getElementById('breadcrumbCourseCode').textContent = courseData.code;
+      document.getElementById('creditsBadge').textContent = courseData.credits + ' Credits';
+      document.getElementById('semesterBadge').textContent = courseData.semesterDisplay;
+      document.getElementById('courseDescription').textContent = courseData.description;
+      document.getElementById('infoCredits').textContent = courseData.credits + ' credits';
+      
+      // Update category badge
+      const categoryBadge = document.getElementById('categoryBadge');
+      categoryBadge.textContent = courseData.categoryName;
+      categoryBadge.className = `badge-${courseData.category} px-3 py-1.5 rounded-full text-sm font-medium`;
+      
+      // Update prerequisites
+      const prereqEl = document.getElementById('prerequisites');
+      if (courseData.prerequisites.length === 0) {
+        prereqEl.textContent = 'None';
+      } else {
+        prereqEl.innerHTML = courseData.prerequisites.map(p => 
+          `<a href="/course-detail.html?id=${p}" class="text-hkmu-blue hover:underline">${p}</a>`
+        ).join(', ');
+      }
+      
+      // Update status
+      updateStatusDisplay(courseData.status);
+    }
+    
+    // ==================== STATUS MANAGEMENT ====================
+    
+    function updateStatus(status) {
+      courseData.status = status;
+      updateStatusDisplay(status);
+      
+      const statusMessages = {
+        'completed': 'Course marked as completed!',
+        'in-progress': 'Course marked as in progress!',
+        'available': 'Course status reset to available'
+      };
+      
+      showToast(statusMessages[status], status === 'completed' ? 'success' : status === 'in-progress' ? 'warning' : 'info');
+    }
+    
+    function updateStatusDisplay(status) {
+      const badge = document.getElementById('statusBadge');
+      const text = document.getElementById('statusText');
+      
+      // Remove all status classes
+      badge.classList.remove('status-completed', 'status-in-progress', 'status-available', 'status-locked');
+      
+      // Add appropriate class and update text
+      const statusConfig = {
+        'completed': { class: 'status-completed', text: 'Completed', icon: 'check-circle' },
+        'in-progress': { class: 'status-in-progress', text: 'In Progress', icon: 'clock' },
+        'available': { class: 'status-available', text: 'Available', icon: 'circle' },
+        'locked': { class: 'status-locked', text: 'Locked', icon: 'lock' }
+      };
+      
+      const config = statusConfig[status];
+      badge.classList.add(config.class);
+      text.textContent = config.text;
+      
+      // Update icon
+      badge.innerHTML = `<i data-lucide="${config.icon}" class="w-4 h-4"></i><span>${config.text}</span>`;
+      lucide.createIcons();
+    }
+    
+    // ==================== TAB SWITCHING ====================
+    
+    function switchTab(tab) {
+      const reviewsTab = document.getElementById('reviewsTab');
+      const materialsTab = document.getElementById('materialsTab');
+      const reviewsContent = document.getElementById('reviewsContent');
+      const materialsContent = document.getElementById('materialsContent');
+      
+      if (tab === 'reviews') {
+        reviewsTab.classList.add('active');
+        materialsTab.classList.remove('active');
+        reviewsContent.classList.remove('hidden');
+        materialsContent.classList.add('hidden');
+      } else {
+        reviewsTab.classList.remove('active');
+        materialsTab.classList.add('active');
+        reviewsContent.classList.add('hidden');
+        materialsContent.classList.remove('hidden');
+      }
+    }
+    
+    // ==================== REVIEWS ====================
+    
+    function renderReviews() {
+      const container = document.getElementById('reviewsList');
+      document.getElementById('reviewCount').textContent = reviews.length;
+      
+      if (reviews.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-12">
+            <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <i data-lucide="message-square" class="w-8 h-8 text-text-muted"></i>
+            </div>
+            <p class="text-text-muted">No reviews yet. Be the first to share your experience!</p>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+      
+      container.innerHTML = reviews.map((review, index) => `
+        <div class="bg-gray-50 rounded-xl p-5 card-hover animate-fade-in" style="animation-delay: ${index * 0.1}s">
+          <div class="flex items-start justify-between gap-4 mb-3">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 bg-hkmu-blue/10 rounded-full flex items-center justify-center">
+                <span class="text-hkmu-blue font-semibold">${review.author.charAt(0)}</span>
+              </div>
+              <div>
+                <p class="font-medium text-text-primary">${review.isAnonymous ? 'Anonymous' : review.author}</p>
+                <p class="text-xs text-text-muted">Year ${review.authorYear} • ${review.semester}</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-1">
+              ${renderStars(review.rating)}
+            </div>
+          </div>
+          
+          <p class="text-text-secondary text-sm leading-relaxed mb-4">${review.content}</p>
+          
+          <div class="flex items-center justify-between">
+            <span class="text-xs text-text-muted">${formatDate(review.createdAt)}</span>
+            <button onclick="markHelpful('${review.id}')" class="flex items-center gap-1.5 text-sm text-text-secondary hover:text-hkmu-blue transition-colors">
+              <i data-lucide="thumbs-up" class="w-4 h-4"></i>
+              <span>Helpful (${review.helpfulCount})</span>
+            </button>
+          </div>
+        </div>
+      `).join('');
+      
+      lucide.createIcons();
+    }
+    
+    function renderStars(rating) {
+      return Array(5).fill(0).map((_, i) => `
+        <i data-lucide="star" class="w-4 h-4 ${i < rating ? 'text-amber-400 fill-amber-400' : 'text-gray-300'}"></i>
+      `).join('');
+    }
+    
+    function markHelpful(reviewId) {
+      const review = reviews.find(r => r.id === reviewId);
+      if (review) {
+        review.helpfulCount++;
+        renderReviews();
+        showToast('Marked as helpful!', 'success');
+      }
+    }
+    
+    // ==================== REVIEW MODAL ====================
+    
+    function openReviewModal() {
+      const modal = document.getElementById('reviewModal');
+      modal.classList.remove('hidden');
+      const content = modal.querySelector('.modal-content');
+      content.classList.add('animate-modal-in');
+      document.body.style.overflow = 'hidden';
+    }
+    
+    function closeReviewModal() {
+      const modal = document.getElementById('reviewModal');
+      const content = modal.querySelector('.modal-content');
+      content.classList.remove('animate-modal-in');
+      content.classList.add('animate-modal-out');
+      
+      setTimeout(() => {
+        modal.classList.add('hidden');
+        content.classList.remove('animate-modal-out');
+        document.body.style.overflow = '';
+        resetReviewForm();
+      }, 200);
+    }
+    
+    function setRating(rating) {
+      currentRating = rating;
+      document.getElementById('ratingInput').value = rating;
+      
+      const stars = document.querySelectorAll('#ratingSelector .star');
+      stars.forEach((star, index) => {
+        if (index < rating) {
+          star.classList.remove('empty');
+          star.classList.add('filled');
+        } else {
+          star.classList.remove('filled');
+          star.classList.add('empty');
+        }
+      });
+      
+      document.getElementById('ratingError').classList.add('hidden');
+    }
+    
+    function resetReviewForm() {
+      document.getElementById('reviewForm').reset();
+      setRating(0);
+    }
+    
+    // ==================== MATERIALS ====================
+    
+    function renderMaterials() {
+      const container = document.getElementById('materialsList');
+      document.getElementById('materialCount').textContent = materials.length;
+      
+      if (materials.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-12">
+            <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <i data-lucide="file-text" class="w-8 h-8 text-text-muted"></i>
+            </div>
+            <p class="text-text-muted">No materials uploaded yet. Share your notes!</p>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+      
+      container.innerHTML = materials.map((material, index) => `
+        <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-xl card-hover animate-fade-in" style="animation-delay: ${index * 0.1}s">
+          <div class="w-12 h-12 ${getFileIconBg(material.fileType)} rounded-xl flex items-center justify-center flex-shrink-0">
+            <i data-lucide="${getFileIcon(material.fileType)}" class="w-6 h-6 ${getFileIconColor(material.fileType)}"></i>
+          </div>
+          
+          <div class="flex-1 min-w-0">
+            <p class="font-medium text-text-primary truncate">${material.originalName}</p>
+            <p class="text-xs text-text-muted truncate">${material.description || 'No description'}</p>
+            <div class="flex items-center gap-3 mt-1 text-xs text-text-muted">
+              <span>By ${material.uploadedBy}</span>
+              <span>•</span>
+              <span>${formatFileSize(material.fileSize)}</span>
+              <span>•</span>
+              <span>${material.downloadCount} downloads</span>
+            </div>
+          </div>
+          
+          <button onclick="downloadMaterial('${material.id}')" class="btn-hover flex items-center gap-2 px-4 py-2 bg-hkmu-blue text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
+            <i data-lucide="download" class="w-4 h-4"></i>
+            <span class="hidden sm:inline">Download</span>
+          </button>
+        </div>
+      `).join('');
+      
+      lucide.createIcons();
+    }
+    
+    function getFileIcon(fileType) {
+      if (fileType.includes('pdf')) return 'file-text';
+      if (fileType.includes('word') || fileType.includes('doc')) return 'file-type';
+      if (fileType.includes('powerpoint') || fileType.includes('ppt')) return 'presentation';
+      if (fileType.includes('zip') || fileType.includes('compressed')) return 'archive';
+      return 'file';
+    }
+    
+    function getFileIconColor(fileType) {
+      if (fileType.includes('pdf')) return 'file-icon-pdf';
+      if (fileType.includes('word') || fileType.includes('doc')) return 'file-icon-doc';
+      if (fileType.includes('powerpoint') || fileType.includes('ppt')) return 'file-icon-ppt';
+      if (fileType.includes('zip') || fileType.includes('compressed')) return 'file-icon-zip';
+      return 'file-icon-default';
+    }
+    
+    function getFileIconBg(fileType) {
+      if (fileType.includes('pdf')) return 'bg-red-100';
+      if (fileType.includes('word') || fileType.includes('doc')) return 'bg-blue-100';
+      if (fileType.includes('powerpoint') || fileType.includes('ppt')) return 'bg-orange-100';
+      if (fileType.includes('zip') || fileType.includes('compressed')) return 'bg-purple-100';
+      return 'bg-gray-100';
+    }
+    
+    function downloadMaterial(materialId) {
+      const material = materials.find(m => m.id === materialId);
+      if (material) {
+        material.downloadCount++;
+        renderMaterials();
+        showToast(`Downloading ${material.originalName}...`, 'success');
+      }
+    }
+    
+    // ==================== UPLOAD MODAL ====================
+    
+    function openUploadModal() {
+      const modal = document.getElementById('uploadModal');
+      modal.classList.remove('hidden');
+      const content = modal.querySelector('.modal-content');
+      content.classList.add('animate-modal-in');
+      document.body.style.overflow = 'hidden';
+    }
+    
+    function closeUploadModal() {
+      const modal = document.getElementById('uploadModal');
+      const content = modal.querySelector('.modal-content');
+      content.classList.remove('animate-modal-in');
+      content.classList.add('animate-modal-out');
+      
+      setTimeout(() => {
+        modal.classList.add('hidden');
+        content.classList.remove('animate-modal-out');
+        document.body.style.overflow = '';
+        resetUploadForm();
+      }, 200);
+    }
+    
+    function setupDragAndDrop() {
+      const dropZone = document.getElementById('dropZone');
+      const fileInput = document.getElementById('fileInput');
+      
+      dropZone.addEventListener('click', () => fileInput.click());
+      
+      fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+          handleFileSelect(e.target.files[0]);
+        }
+      });
+      
+      dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('drag-over');
+      });
+      
+      dropZone.addEventListener('dragleave', () => {
+        dropZone.classList.remove('drag-over');
+      });
+      
+      dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('drag-over');
+        if (e.dataTransfer.files.length > 0) {
+          handleFileSelect(e.dataTransfer.files[0]);
+        }
+      });
+    }
+    
+    function handleFileSelect(file) {
+      // Validate file type
+      const allowedTypes = ['.pdf', '.doc', '.docx', '.ppt', '.pptx', '.zip'];
+      const fileExt = '.' + file.name.split('.').pop().toLowerCase();
+      
+      if (!allowedTypes.includes(fileExt)) {
+        showToast('Invalid file type. Please upload PDF, DOC, DOCX, PPT, PPTX, or ZIP files.', 'error');
+        return;
+      }
+      
+      // Validate file size (50MB)
+      if (file.size > 50 * 1024 * 1024) {
+        showToast('File too large. Maximum size is 50MB.', 'error');
+        return;
+      }
+      
+      selectedFile = file;
+      
+      // Update UI
+      document.getElementById('uploadPrompt').classList.add('hidden');
+      document.getElementById('filePreview').classList.remove('hidden');
+      document.getElementById('selectedFileName').textContent = file.name;
+      document.getElementById('selectedFileSize').textContent = formatFileSize(file.size);
+      document.getElementById('uploadSubmitBtn').disabled = false;
+    }
+    
+    function clearFileSelection() {
+      selectedFile = null;
+      document.getElementById('fileInput').value = '';
+      document.getElementById('uploadPrompt').classList.remove('hidden');
+      document.getElementById('filePreview').classList.add('hidden');
+      document.getElementById('uploadSubmitBtn').disabled = true;
+    }
+    
+    function resetUploadForm() {
+      document.getElementById('uploadForm').reset();
+      clearFileSelection();
+      document.getElementById('uploadProgress').classList.add('hidden');
+      document.getElementById('progressBar').style.width = '0%';
+    }
+    
+    function simulateUpload(callback) {
+      const progressBar = document.getElementById('progressBar');
+      const progressPercent = document.getElementById('progressPercent');
+      const uploadProgress = document.getElementById('uploadProgress');
+      
+      uploadProgress.classList.remove('hidden');
+      
+      let progress = 0;
+      const interval = setInterval(() => {
+        progress += Math.random() * 15;
+        if (progress >= 100) {
+          progress = 100;
+          clearInterval(interval);
+          setTimeout(callback, 300);
+        }
+        progressBar.style.width = progress + '%';
+        progressPercent.textContent = Math.round(progress) + '%';
+      }, 200);
+    }
+    
+    // ==================== RELATED COURSES ====================
+    
+    function renderRelatedCourses() {
+      const container = document.getElementById('relatedCourses');
+      
+      container.innerHTML = relatedCourses.map(course => `
+        <a href="/course-detail.html?id=${course.id}" class="block p-4 bg-gray-50 rounded-xl hover:bg-light-blue transition-colors card-hover">
+          <div class="flex items-start justify-between gap-3">
+            <div class="flex-1 min-w-0">
+              <p class="font-mono text-sm text-hkmu-blue font-medium">${course.code}</p>
+              <p class="text-sm text-text-primary truncate">${course.title}</p>
+              <div class="flex items-center gap-2 mt-2">
+                <span class="badge-${course.category} text-xs px-2 py-0.5 rounded-full">${course.categoryName}</span>
+                <span class="text-xs text-text-muted">${course.credits} credits</span>
+              </div>
+            </div>
+            <i data-lucide="chevron-right" class="w-5 h-5 text-text-muted flex-shrink-0"></i>
+          </div>
+        </a>
+      `).join('');
+      
+      lucide.createIcons();
+    }
+    
+    // ==================== FORMS ====================
+    
+    function setupForms() {
+      // Review form
+      document.getElementById('reviewForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        if (currentRating === 0) {
+          document.getElementById('ratingError').classList.remove('hidden');
+          return;
+        }
+        
+        const newReview = {
+          id: 'rev_' + Date.now(),
+          author: document.getElementById('reviewerName').value,
+          authorYear: 2, // Default
+          semester: document.getElementById('semesterTaken').value,
+          rating: currentRating,
+          content: document.getElementById('reviewText').value,
+          helpfulCount: 0,
+          createdAt: new Date().toISOString(),
+          isAnonymous: document.getElementById('anonymousReview').checked
+        };
+        
+        reviews.unshift(newReview);
+        renderReviews();
+        closeReviewModal();
+        showToast('Review submitted successfully!', 'success');
+      });
+      
+      // Upload form
+      document.getElementById('uploadForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        if (!selectedFile) {
+          showToast('Please select a file to upload', 'error');
+          return;
+        }
+        
+        simulateUpload(() => {
+          const newMaterial = {
+            id: 'mat_' + Date.now(),
+            filename: selectedFile.name,
+            originalName: selectedFile.name,
+            fileSize: selectedFile.size,
+            fileType: selectedFile.type || 'application/octet-stream',
+            description: document.getElementById('fileDescription').value,
+            uploadedBy: document.getElementById('uploaderName').value,
+            downloadCount: 0,
+            createdAt: new Date().toISOString()
+          };
+          
+          materials.unshift(newMaterial);
+          renderMaterials();
+          closeUploadModal();
+          showToast('File uploaded successfully!', 'success');
+        });
+      });
+    }
+    
+    // ==================== MOBILE MENU ====================
+    
+    function setupMobileMenu() {
+      const menuBtn = document.getElementById('mobileMenuBtn');
+      const closeBtn = document.getElementById('closeMobileMenu');
+      const menu = document.getElementById('mobileMenu');
+      const overlay = document.getElementById('mobileMenuOverlay');
+      
+      function openMenu() {
+        menu.classList.add('open');
+        overlay.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+      }
+      
+      function closeMenu() {
+        menu.classList.remove('open');
+        overlay.classList.add('hidden');
+        document.body.style.overflow = '';
+      }
+      
+      menuBtn.addEventListener('click', openMenu);
+      closeBtn.addEventListener('click', closeMenu);
+      overlay.addEventListener('click', closeMenu);
+    }
+    
+    // ==================== UTILITIES ====================
+    
+    function formatDate(dateString) {
+      const date = new Date(dateString);
+      const now = new Date();
+      const diff = now - date;
+      
+      // Less than a day
+      if (diff < 24 * 60 * 60 * 1000) {
+        return 'Today';
+      }
+      
+      // Less than a week
+      if (diff < 7 * 24 * 60 * 60 * 1000) {
+        const days = Math.floor(diff / (24 * 60 * 60 * 1000));
+        return days + ' days ago';
+      }
+      
+      // Less than a month
+      if (diff < 30 * 24 * 60 * 60 * 1000) {
+        const weeks = Math.floor(diff / (7 * 24 * 60 * 60 * 1000));
+        return weeks + ' weeks ago';
+      }
+      
+      // Format as date
+      return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+    }
+    
+    function formatFileSize(bytes) {
+      if (bytes === 0) return '0 Bytes';
+      const k = 1024;
+      const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+    }
+    
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      
+      const colors = {
+        success: 'bg-green-500',
+        error: 'bg-red-500',
+        warning: 'bg-orange-500',
+        info: 'bg-hkmu-blue'
+      };
+      
+      const icons = {
+        success: 'check-circle',
+        error: 'alert-circle',
+        warning: 'alert-triangle',
+        info: 'info'
+      };
+      
+      toast.className = `toast flex items-center gap-3 px-4 py-3 ${colors[type]} text-white rounded-lg shadow-lg min-w-[300px]`;
+      toast.innerHTML = `
+        <i data-lucide="${icons[type]}" class="w-5 h-5"></i>
+        <span class="text-sm font-medium">${message}</span>
+      `;
+      
+      container.appendChild(toast);
+      lucide.createIcons();
+      
+      setTimeout(() => {
+        toast.classList.add('hide');
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+  </script>
+</body>
+</html>

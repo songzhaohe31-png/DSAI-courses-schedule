@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Degree Progress | HKMU Data Science</title>
+    
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS v4 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'hkmu-blue': '#0066CC',
+                        'hkmu-green': '#2E7D52',
+                        'success-green': '#4CAF50',
+                        'warning-orange': '#FF9800',
+                        'info-blue': '#2196F3',
+                        'locked-gray': '#9E9E9E',
+                        'light-blue': '#E3F2FD',
+                        'light-green': '#E8F5E9',
+                        'light-orange': '#FFF3E0',
+                        'light-gray': '#F5F5F5',
+                        'text-primary': '#1A1A2E',
+                        'text-secondary': '#6B7280',
+                        'text-muted': '#9CA3AF',
+                        'core-blue': '#0066CC',
+                        'elective-purple': '#7C3AED',
+                        'project-amber': '#F59E0B',
+                        'english-emerald': '#10B981',
+                        'general-pink': '#EC4899',
+                        'university-indigo': '#6366F1',
+                    },
+                    fontFamily: {
+                        'heading': ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+                        'body': ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+                        'mono': ['JetBrains Mono', 'Fira Code', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #F5F7FA;
+            color: #1A1A2E;
+        }
+        
+        /* Page Load Animation */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .animate-fade-in {
+            animation: fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            opacity: 0;
+        }
+        
+        .animate-delay-1 { animation-delay: 0.1s; }
+        .animate-delay-2 { animation-delay: 0.2s; }
+        .animate-delay-3 { animation-delay: 0.3s; }
+        .animate-delay-4 { animation-delay: 0.4s; }
+        .animate-delay-5 { animation-delay: 0.5s; }
+        
+        /* Progress Bar Animation */
+        @keyframes progressFill {
+            from { width: 0%; }
+        }
+        
+        .progress-bar-fill {
+            animation: progressFill 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+        
+        /* Pulse Animation for In Progress */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+        
+        .animate-pulse-slow {
+            animation: pulse 2s infinite;
+        }
+        
+        /* Card Hover Effect */
+        .course-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .course-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        /* Stats Card Hover */
+        .stats-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .stats-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        /* Tab Animation */
+        .tab-btn {
+            transition: all 0.2s ease;
+        }
+        
+        .tab-btn:hover {
+            background-color: #E3F2FD;
+        }
+        
+        .tab-btn.active {
+            background-color: #0066CC;
+            color: white;
+        }
+        
+        /* Button Hover Effects */
+        .btn-primary {
+            transition: all 0.2s ease-in-out;
+        }
+        
+        .btn-primary:hover {
+            transform: scale(1.02);
+        }
+        
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+        
+        /* Stagger Animation for Course Cards */
+        @keyframes staggerFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .stagger-card {
+            animation: staggerFadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            opacity: 0;
+        }
+        
+        /* Counter Animation */
+        @keyframes countUp {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* Mobile Navigation */
+        .mobile-menu {
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .mobile-menu.open {
+            transform: translateX(0);
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a1a1a1;
+        }
+        
+        /* Status Badge Styles */
+        .status-completed { background-color: #E8F5E9; color: #2E7D52; }
+        .status-inprogress { background-color: #FFF3E0; color: #E65100; }
+        .status-available { background-color: #E3F2FD; color: #1565C0; }
+        .status-locked { background-color: #F5F5F5; color: #616161; }
+        
+        /* Category Badge Styles */
+        .category-core { background-color: #E3F2FD; color: #0066CC; }
+        .category-elective { background-color: #EDE9FE; color: #7C3AED; }
+        .category-project { background-color: #FEF3C7; color: #D97706; }
+        .category-english { background-color: #D1FAE5; color: #059669; }
+        .category-general { background-color: #FCE7F3; color: #DB2777; }
+        .category-university { background-color: #E0E7FF; color: #4F46E5; }
+        
+        /* Year Tab Styles */
+        .year-tab {
+            transition: all 0.3s ease;
+        }
+        
+        .year-tab.active {
+            background: linear-gradient(135deg, #0066CC, #2E7D52);
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 102, 204, 0.3);
+        }
+        
+        .year-tab:not(.active):hover {
+            background-color: #E3F2FD;
+        }
+        
+        /* Filter Button Styles */
+        .filter-btn {
+            transition: all 0.2s ease;
+        }
+        
+        .filter-btn.active {
+            background-color: #0066CC;
+            color: white;
+        }
+        
+        .filter-btn:not(.active):hover {
+            background-color: #E3F2FD;
+        }
+        
+        /* Progress Bar Gradient */
+        .progress-gradient {
+            background: linear-gradient(90deg, #0066CC, #2E7D52);
+        }
+        
+        /* Semester Section */
+        .semester-section {
+            border-left: 3px solid #0066CC;
+        }
+        
+        .semester-spring {
+            border-left-color: #2E7D52;
+        }
+        
+        .semester-summer {
+            border-left-color: #FF9800;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+    <!-- Navigation Header -->
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-hkmu-blue to-hkmu-green rounded-lg flex items-center justify-center">
+                        <i data-lucide="graduation-cap" class="w-6 h-6 text-white"></i>
+                    </div>
+                    <div class="hidden sm:block">
+                        <span class="text-lg font-bold text-text-primary">HKMU</span>
+                        <span class="text-sm text-text-secondary ml-1">Data Science</span>
+                    </div>
+                </div>
+                
+                <!-- Desktop Navigation -->
+                <div class="hidden md:flex items-center space-x-1">
+                    <a href="/progress" class="px-4 py-2 rounded-lg text-hkmu-blue font-semibold bg-light-blue flex items-center space-x-2">
+                        <i data-lucide="bar-chart-2" class="w-4 h-4"></i>
+                        <span>Degree Progress</span>
+                    </a>
+                    <a href="/courses" class="px-4 py-2 rounded-lg text-text-secondary hover:text-hkmu-blue hover:bg-light-blue transition-colors flex items-center space-x-2">
+                        <i data-lucide="book-open" class="w-4 h-4"></i>
+                        <span>Courses</span>
+                    </a>
+                    <a href="/pathway" class="px-4 py-2 rounded-lg text-text-secondary hover:text-hkmu-blue hover:bg-light-blue transition-colors flex items-center space-x-2">
+                        <i data-lucide="git-branch" class="w-4 h-4"></i>
+                        <span>Pathway</span>
+                    </a>
+                </div>
+                
+                <!-- Mobile Menu Button -->
+                <button id="mobileMenuBtn" class="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors">
+                    <i data-lucide="menu" class="w-6 h-6 text-text-primary"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div id="mobileMenu" class="mobile-menu fixed inset-y-0 right-0 w-64 bg-white shadow-xl md:hidden z-50">
+            <div class="p-4 border-b flex justify-between items-center">
+                <span class="font-semibold text-text-primary">Menu</span>
+                <button id="closeMobileMenu" class="p-2 rounded-lg hover:bg-gray-100">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="p-4 space-y-2">
+                <a href="/progress" class="block px-4 py-3 rounded-lg text-hkmu-blue font-semibold bg-light-blue flex items-center space-x-3">
+                    <i data-lucide="bar-chart-2" class="w-5 h-5"></i>
+                    <span>Degree Progress</span>
+                </a>
+                <a href="/courses" class="block px-4 py-3 rounded-lg text-text-secondary hover:bg-gray-50 flex items-center space-x-3">
+                    <i data-lucide="book-open" class="w-5 h-5"></i>
+                    <span>Courses</span>
+                </a>
+                <a href="/pathway" class="block px-4 py-3 rounded-lg text-text-secondary hover:bg-gray-50 flex items-center space-x-3">
+                    <i data-lucide="git-branch" class="w-5 h-5"></i>
+                    <span>Pathway</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-1 py-8 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
+            
+            <!-- Page Header -->
+            <div class="animate-fade-in mb-8">
+                <h1 class="text-3xl sm:text-4xl font-bold text-text-primary mb-2">Degree Progress</h1>
+                <p class="text-text-secondary text-lg">Track your Data Science BSc journey</p>
+            </div>
+            
+            <!-- Stats Cards Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                <!-- Total Credits -->
+                <div class="stats-card bg-white rounded-xl p-6 shadow-md animate-fade-in animate-delay-1">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-text-muted text-sm font-medium mb-1">Total Credits Required</p>
+                            <p class="text-3xl font-bold text-hkmu-blue" id="totalCredits">120</p>
+                        </div>
+                        <div class="w-12 h-12 bg-light-blue rounded-xl flex items-center justify-center">
+                            <i data-lucide="graduation-cap" class="w-6 h-6 text-hkmu-blue"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Credits Completed -->
+                <div class="stats-card bg-white rounded-xl p-6 shadow-md animate-fade-in animate-delay-2">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-text-muted text-sm font-medium mb-1">Credits Completed</p>
+                            <p class="text-3xl font-bold text-success-green" id="completedCredits">0</p>
+                        </div>
+                        <div class="w-12 h-12 bg-light-green rounded-xl flex items-center justify-center">
+                            <i data-lucide="check-circle" class="w-6 h-6 text-success-green"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Credits In Progress -->
+                <div class="stats-card bg-white rounded-xl p-6 shadow-md animate-fade-in animate-delay-3">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-text-muted text-sm font-medium mb-1">Credits In Progress</p>
+                            <p class="text-3xl font-bold text-warning-orange" id="inProgressCredits">0</p>
+                        </div>
+                        <div class="w-12 h-12 bg-light-orange rounded-xl flex items-center justify-center">
+                            <i data-lucide="clock" class="w-6 h-6 text-warning-orange"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Credits Remaining -->
+                <div class="stats-card bg-white rounded-xl p-6 shadow-md animate-fade-in animate-delay-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-text-muted text-sm font-medium mb-1">Credits Remaining</p>
+                            <p class="text-3xl font-bold text-info-blue" id="remainingCredits">120</p>
+                        </div>
+                        <div class="w-12 h-12 bg-light-blue rounded-xl flex items-center justify-center">
+                            <i data-lucide="target" class="w-6 h-6 text-info-blue"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Overall Progress Section -->
+            <div class="bg-white rounded-xl p-6 shadow-md mb-8 animate-fade-in animate-delay-2">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
+                    <h2 class="text-xl font-semibold text-text-primary mb-2 sm:mb-0">Overall Progress</h2>
+                    <span class="text-2xl font-bold text-hkmu-blue" id="progressPercentage">0%</span>
+                </div>
+                <div class="relative h-6 bg-gray-200 rounded-full overflow-hidden">
+                    <div id="overallProgressBar" class="progress-gradient h-full rounded-full progress-bar-fill" style="width: 0%"></div>
+                </div>
+                <div class="flex justify-between mt-2 text-sm text-text-muted">
+                    <span>0 credits</span>
+                    <span>60 credits</span>
+                    <span>120 credits</span>
+                </div>
+            </div>
+            
+            <!-- Category Progress Section -->
+            <div class="bg-white rounded-xl p-6 shadow-md mb-8 animate-fade-in animate-delay-3">
+                <h2 class="text-xl font-semibold text-text-primary mb-6">Category Breakdown</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="categoryProgress">
+                    <!-- Core Courses -->
+                    <div class="category-item">
+                        <div class="flex justify-between items-center mb-2">
+                            <div class="flex items-center space-x-2">
+                                <span class="w-3 h-3 rounded-full bg-core-blue"></span>
+                                <span class="font-medium text-text-primary">Core Courses</span>
+                            </div>
+                            <span class="text-sm text-text-secondary"><span class="category-earned" data-category="core">0</span> / 84 credits</span>
+                        </div>
+                        <div class="h-3 bg-gray-200 rounded-full overflow-hidden">
+                            <div class="category-progress-bar h-full rounded-full bg-core-blue transition-all duration-1000" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Elective Courses -->
+                    <div class="category-item">
+                        <div class="flex justify-between items-center mb-2">
+                            <div class="flex items-center space-x-2">
+                                <span class="w-3 h-3 rounded-full bg-elective-purple"></span>
+                                <span class="font-medium text-text-primary">Elective Courses</span>
+                            </div>
+                            <span class="text-sm text-text-secondary"><span class="category-earned" data-category="elective">0</span> / 12 credits</span>
+                        </div>
+                        <div class="h-3 bg-gray-200 rounded-full overflow-hidden">
+                            <div class="category-progress-bar h-full rounded-full bg-elective-purple transition-all duration-1000" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Project Courses -->
+                    <div class="category-item">
+                        <div class="flex justify-between items-center mb-2">
+                            <div class="flex items-center space-x-2">
+                                <span class="w-3 h-3 rounded-full bg-project-amber"></span>
+                                <span class="font-medium text-text-primary">Project Courses</span>
+                            </div>
+                            <span class="text-sm text-text-secondary"><span class="category-earned" data-category="project">0</span> / 6 credits</span>
+                        </div>
+                        <div class="h-3 bg-gray-200 rounded-full overflow-hidden">
+                            <div class="category-progress-bar h-full rounded-full bg-project-amber transition-all duration-1000" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- English Enhancement -->
+                    <div class="category-item">
+                        <div class="flex justify-between items-center mb-2">
+                            <div class="flex items-center space-x-2">
+                                <span class="w-3 h-3 rounded-full bg-english-emerald"></span>
+                                <span class="font-medium text-text-primary">English Enhancement</span>
+                            </div>
+                            <span class="text-sm text-text-secondary"><span class="category-earned" data-category="english">0</span> / 6 credits</span>
+                        </div>
+                        <div class="h-3 bg-gray-200 rounded-full overflow-hidden">
+                            <div class="category-progress-bar h-full rounded-full bg-english-emerald transition-all duration-1000" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- General Education -->
+                    <div class="category-item">
+                        <div class="flex justify-between items-center mb-2">
+                            <div class="flex items-center space-x-2">
+                                <span class="w-3 h-3 rounded-full bg-general-pink"></span>
+                                <span class="font-medium text-text-primary">General Education</span>
+                            </div>
+                            <span class="text-sm text-text-secondary"><span class="category-earned" data-category="general">0</span> / 6 credits</span>
+                        </div>
+                        <div class="h-3 bg-gray-200 rounded-full overflow-hidden">
+                            <div class="category-progress-bar h-full rounded-full bg-general-pink transition-all duration-1000" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- University Core -->
+                    <div class="category-item">
+                        <div class="flex justify-between items-center mb-2">
+                            <div class="flex items-center space-x-2">
+                                <span class="w-3 h-3 rounded-full bg-university-indigo"></span>
+                                <span class="font-medium text-text-primary">University Core</span>
+                            </div>
+                            <span class="text-sm text-text-secondary"><span class="category-earned" data-category="university">0</span> / 9 credits</span>
+                        </div>
+                        <div class="h-3 bg-gray-200 rounded-full overflow-hidden">
+                            <div class="category-progress-bar h-full rounded-full bg-university-indigo transition-all duration-1000" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Status Legend & Filters -->
+            <div class="bg-white rounded-xl p-6 shadow-md mb-8 animate-fade-in animate-delay-3">
+                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                    <!-- Legend -->
+                    <div>
+                        <h3 class="text-sm font-semibold text-text-muted uppercase tracking-wide mb-3">Status Legend</h3>
+                        <div class="flex flex-wrap gap-3">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-6 h-6 rounded-lg bg-light-green flex items-center justify-center">
+                                    <i data-lucide="check" class="w-4 h-4 text-success-green"></i>
+                                </div>
+                                <span class="text-sm text-text-secondary">Completed</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <div class="w-6 h-6 rounded-lg bg-light-orange flex items-center justify-center">
+                                    <i data-lucide="clock" class="w-4 h-4 text-warning-orange"></i>
+                                </div>
+                                <span class="text-sm text-text-secondary">In Progress</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <div class="w-6 h-6 rounded-lg bg-light-blue flex items-center justify-center">
+                                    <i data-lucide="circle" class="w-4 h-4 text-info-blue"></i>
+                                </div>
+                                <span class="text-sm text-text-secondary">Available</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <div class="w-6 h-6 rounded-lg bg-light-gray flex items-center justify-center">
+                                    <i data-lucide="lock" class="w-4 h-4 text-locked-gray"></i>
+                                </div>
+                                <span class="text-sm text-text-secondary">Locked</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Filters -->
+                    <div>
+                        <h3 class="text-sm font-semibold text-text-muted uppercase tracking-wide mb-3">Filter by Status</h3>
+                        <div class="flex flex-wrap gap-2" id="statusFilters">
+                            <button class="filter-btn active px-4 py-2 rounded-lg text-sm font-medium border border-gray-200" data-filter="all">All</button>
+                            <button class="filter-btn px-4 py-2 rounded-lg text-sm font-medium border border-gray-200 text-text-secondary" data-filter="completed">Completed</button>
+                            <button class="filter-btn px-4 py-2 rounded-lg text-sm font-medium border border-gray-200 text-text-secondary" data-filter="inprogress">In Progress</button>
+                            <button class="filter-btn px-4 py-2 rounded-lg text-sm font-medium border border-gray-200 text-text-secondary" data-filter="available">Available</button>
+                            <button class="filter-btn px-4 py-2 rounded-lg text-sm font-medium border border-gray-200 text-text-secondary" data-filter="locked">Locked</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Course Statistics -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8 animate-fade-in animate-delay-4">
+                <div class="bg-white rounded-xl p-4 shadow-md text-center">
+                    <div class="w-10 h-10 mx-auto mb-2 bg-light-green rounded-lg flex items-center justify-center">
+                        <i data-lucide="check-circle" class="w-5 h-5 text-success-green"></i>
+                    </div>
+                    <p class="text-2xl font-bold text-success-green" id="completedCount">0</p>
+                    <p class="text-sm text-text-muted">Completed</p>
+                </div>
+                <div class="bg-white rounded-xl p-4 shadow-md text-center">
+                    <div class="w-10 h-10 mx-auto mb-2 bg-light-orange rounded-lg flex items-center justify-center">
+                        <i data-lucide="clock" class="w-5 h-5 text-warning-orange"></i>
+                    </div>
+                    <p class="text-2xl font-bold text-warning-orange" id="inProgressCount">0</p>
+                    <p class="text-sm text-text-muted">In Progress</p>
+                </div>
+                <div class="bg-white rounded-xl p-4 shadow-md text-center">
+                    <div class="w-10 h-10 mx-auto mb-2 bg-light-blue rounded-lg flex items-center justify-center">
+                        <i data-lucide="circle" class="w-5 h-5 text-info-blue"></i>
+                    </div>
+                    <p class="text-2xl font-bold text-info-blue" id="availableCount">0</p>
+                    <p class="text-sm text-text-muted">Available</p>
+                </div>
+                <div class="bg-white rounded-xl p-4 shadow-md text-center">
+                    <div class="w-10 h-10 mx-auto mb-2 bg-light-gray rounded-lg flex items-center justify-center">
+                        <i data-lucide="lock" class="w-5 h-5 text-locked-gray"></i>
+                    </div>
+                    <p class="text-2xl font-bold text-locked-gray" id="lockedCount">0</p>
+                    <p class="text-sm text-text-muted">Locked</p>
+                </div>
+            </div>
+            
+            <!-- Four-Year Course Grid -->
+            <div class="animate-fade-in animate-delay-5">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+                    <h2 class="text-xl font-semibold text-text-primary mb-4 sm:mb-0">Course Curriculum</h2>
+                    
+                    <!-- Year Tabs -->
+                    <div class="flex space-x-2 bg-gray-100 p-1 rounded-xl">
+                        <button class="year-tab active px-4 py-2 rounded-lg text-sm font-medium" data-year="1">Year 1</button>
+                        <button class="year-tab px-4 py-2 rounded-lg text-sm font-medium text-text-secondary" data-year="2">Year 2</button>
+                        <button class="year-tab px-4 py-2 rounded-lg text-sm font-medium text-text-secondary" data-year="3">Year 3</button>
+                        <button class="year-tab px-4 py-2 rounded-lg text-sm font-medium text-text-secondary" data-year="4">Year 4</button>
+                    </div>
+                </div>
+                
+                <!-- Course Grid Container -->
+                <div id="courseGrid" class="space-y-6">
+                    <!-- Content will be populated by JavaScript -->
+                </div>
+            </div>
+            
+            <!-- Elective Courses Section -->
+            <div class="mt-12 animate-fade-in animate-delay-5">
+                <h2 class="text-xl font-semibold text-text-primary mb-6">Elective Courses</h2>
+                <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-4 text-left text-sm font-semibold text-text-secondary">Course Code</th>
+                                    <th class="px-6 py-4 text-left text-sm font-semibold text-text-secondary">Course Name</th>
+                                    <th class="px-6 py-4 text-center text-sm font-semibold text-text-secondary">Credits</th>
+                                    <th class="px-6 py-4 text-left text-sm font-semibold text-text-secondary">Prerequisites</th>
+                                    <th class="px-6 py-4 text-center text-sm font-semibold text-text-secondary">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="electiveTableBody" class="divide-y divide-gray-100">
+                                <!-- Populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-white border-t mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="flex items-center space-x-3 mb-4 md:mb-0">
+                    <div class="w-8 h-8 bg-gradient-to-br from-hkmu-blue to-hkmu-green rounded-lg flex items-center justify-center">
+                        <i data-lucide="graduation-cap" class="w-4 h-4 text-white"></i>
+                    </div>
+                    <span class="text-sm text-text-secondary">HKMU Data Science Program</span>
+                </div>
+                <div class="flex space-x-6 text-sm text-text-secondary">
+                    <a href="#" class="hover:text-hkmu-blue transition-colors">Privacy Policy</a>
+                    <a href="#" class="hover:text-hkmu-blue transition-colors">Terms of Use</a>
+                    <a href="#" class="hover:text-hkmu-blue transition-colors">Contact</a>
+                </div>
+            </div>
+            <div class="mt-6 pt-6 border-t text-center text-sm text-text-muted">
+                <p>&copy; 2024 HKMU Data Science Program. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+
+        // Initialize Lucide Icons
+        lucide.createIcons();
+        
+        // Course Data
+        const coursesData = {
+            year1: {
+                autumn: [
+                    { id: "COMP1080SEF", code: "COMP 1080SEF", name: "Introduction to Computer Programming", credits: 3, category: "core", status: "completed", prerequisites: [] },
+                    { id: "IT1020SEF", code: "IT 1020SEF", name: "Computing Fundamentals", credits: 3, category: "core", status: "completed", prerequisites: [] },
+                    { id: "MATH1410SEF", code: "MATH 1410SEF", name: "Algebra and Calculus", credits: 3, category: "core", status: "completed", prerequisites: [] },
+                    { id: "GENE1000", code: "GENE 1000", name: "General Education Course", credits: 3, category: "general", status: "completed", prerequisites: [] },
+                    { id: "ENGL1101AEF", code: "ENGL 1101AEF", name: "University English: Reading and Writing", credits: 3, category: "english", status: "completed", prerequisites: [] },
+                ],
+                spring: [
+                    { id: "COMP2090SEF", code: "COMP 2090SEF", name: "Data Structures, Algorithms & Problem Solving", credits: 3, category: "core", status: "inprogress", prerequisites: ["COMP1080SEF"] },
+                    { id: "IT1030SEF", code: "IT 1030SEF", name: "Introduction to Internet Application Development", credits: 3, category: "core", status: "inprogress", prerequisites: ["IT1020SEF"] },
+                    { id: "STAT1510SEF", code: "STAT 1510SEF", name: "Probability & Distributions", credits: 3, category: "core", status: "inprogress", prerequisites: ["MATH1410SEF"] },
+                    { id: "STAT2610SEF", code: "STAT 2610SEF", name: "Data Analytics with Applications", credits: 3, category: "core", status: "available", prerequisites: [] },
+                    { id: "GENE1001", code: "GENE 1001", name: "General Education Course", credits: 3, category: "general", status: "available", prerequisites: [] },
+                    { id: "ENGL1202EEF", code: "ENGL 1202EEF", name: "University English: Listening and Speaking", credits: 3, category: "english", status: "available", prerequisites: [] },
+                ]
+            },
+            year2: {
+                autumn: [
+                    { id: "COMP2020SEF", code: "COMP 2020SEF", name: "Java Programming Fundamentals", credits: 3, category: "core", status: "available", prerequisites: ["COMP1080SEF"] },
+                    { id: "COMP2640SEF", code: "COMP 2640SEF", name: "Discrete Mathematics", credits: 3, category: "core", status: "available", prerequisites: ["MATH1410SEF"] },
+                    { id: "MATH2150SEF", code: "MATH 2150SEF", name: "Linear Algebra", credits: 3, category: "core", status: "available", prerequisites: ["MATH1410SEF"] },
+                    { id: "STAT2510SEF", code: "STAT 2510SEF", name: "Statistical Data Analysis", credits: 3, category: "core", status: "locked", prerequisites: ["STAT1510SEF"] },
+                ],
+                spring: [
+                    { id: "COMP2030SEF", code: "COMP 2030SEF", name: "Intermediate Java Programming & UI Design", credits: 3, category: "core", status: "locked", prerequisites: ["COMP2020SEF"] },
+                    { id: "IT2900SEF", code: "IT 2900SEF", name: "Human Computer Interaction & UX Design", credits: 3, category: "core", status: "locked", prerequisites: ["IT1030SEF"] },
+                    { id: "STAT2520SEF", code: "STAT 2520SEF", name: "Applied Statistical Methods", credits: 3, category: "core", status: "locked", prerequisites: ["STAT2510SEF"] },
+                    { id: "STAT2630SEF", code: "STAT 2630SEF", name: "Big Data Analytics with Applications", credits: 3, category: "core", status: "locked", prerequisites: ["STAT2610SEF"] },
+                ]
+            },
+            year3: {
+                autumn: [
+                    { id: "COMP3130SEF", code: "COMP 3130SEF", name: "Mobile Application Programming", credits: 3, category: "core", status: "locked", prerequisites: ["COMP2030SEF"] },
+                    { id: "COMP3200SEF", code: "COMP 3200SEF", name: "Database Management", credits: 3, category: "core", status: "locked", prerequisites: ["COMP2090SEF"] },
+                    { id: "COMP3500SEF", code: "COMP 3500SEF", name: "Software Engineering", credits: 3, category: "core", status: "locked", prerequisites: ["COMP2030SEF"] },
+                ],
+                spring: [
+                    { id: "COMP3510SEF", code: "COMP 3510SEF", name: "Software Project Management", credits: 3, category: "core", status: "locked", prerequisites: ["COMP3500SEF"] },
+                    { id: "COMP3810SEF", code: "COMP 3810SEF", name: "Server-side Technologies and Cloud Computing", credits: 3, category: "core", status: "locked", prerequisites: ["COMP3200SEF"] },
+                    { id: "COMP3920SEF", code: "COMP 3920SEF", name: "Machine Learning", credits: 3, category: "core", status: "locked", prerequisites: ["STAT2520SEF", "MATH2150SEF"] },
+                    { id: "STAT3110SEF", code: "STAT 3110SEF", name: "Time Series Analysis & Forecasting", credits: 3, category: "core", status: "locked", prerequisites: ["STAT2520SEF"] },
+                    { id: "STAT3660SEF", code: "STAT 3660SEF", name: "SAS Programming", credits: 3, category: "core", status: "locked", prerequisites: ["STAT2510SEF"] },
+                ],
+                summer: [
+                    { id: "MATH4950SEF", code: "MATH 4950SEF", name: "Professional Placement", credits: 3, category: "elective", status: "locked", prerequisites: [] },
+                ]
+            },
+            year4: {
+                autumn: [
+                    { id: "COMP4330SEF", code: "COMP 4330SEF", name: "Advanced Programming & AI Algorithms", credits: 3, category: "core", status: "locked", prerequisites: ["COMP3920SEF"] },
+                    { id: "COMP4610SEF", code: "COMP 4610SEF", name: "Data Science Project", credits: 6, category: "project", status: "locked", prerequisites: [] },
+                    { id: "COMP4930SEF", code: "COMP 4930SEF", name: "Deep Learning", credits: 3, category: "core", status: "locked", prerequisites: ["COMP3920SEF"] },
+                    { id: "ELEC1", code: "ELEC XXXX", name: "Elective Course", credits: 3, category: "elective", status: "locked", prerequisites: [] },
+                ],
+                spring: [
+                    { id: "COMP4210SEF", code: "COMP 4210SEF", name: "Advanced Database & Data Warehousing", credits: 3, category: "core", status: "locked", prerequisites: ["COMP3200SEF"] },
+                    { id: "COMP4600SEF", code: "COMP 4600SEF", name: "Advanced Topics in Data Mining", credits: 3, category: "core", status: "locked", prerequisites: ["COMP3920SEF"] },
+                    { id: "ELEC2", code: "ELEC XXXX", name: "Elective Course", credits: 3, category: "elective", status: "locked", prerequisites: [] },
+                    { id: "ELEC3", code: "ELEC XXXX", name: "Elective Course", credits: 3, category: "elective", status: "locked", prerequisites: [] },
+                ]
+            }
+        };
+        
+        // Elective Courses Data
+        const electiveCourses = [
+            { id: "COMP4630SEF", code: "COMP 4630SEF", name: "Distributed Systems and Parallel Computing", credits: 3, prerequisites: "COMP 2030SEF", status: "locked" },
+            { id: "ELEC3050SEF", code: "ELEC 3050SEF", name: "Computer Networking", credits: 3, prerequisites: "None", status: "available" },
+            { id: "ELEC3250SEF", code: "ELEC 3250SEF", name: "Computer & Network Security", credits: 3, prerequisites: "ELEC 3050SEF", status: "locked" },
+            { id: "ELEC4310SEF", code: "ELEC 4310SEF", name: "Blockchain Technologies", credits: 3, prerequisites: "COMP 2020SEF", status: "locked" },
+            { id: "ELEC4710SEF", code: "ELEC 4710SEF", name: "Digital Forensics", credits: 3, prerequisites: "None", status: "available" },
+        ];
+        
+        // Category Totals
+        const categoryTotals = {
+            core: 84,
+            elective: 12,
+            project: 6,
+            english: 6,
+            general: 6,
+            university: 9
+        };
+        
+        // Current State
+        let currentYear = 1;
+        let currentFilter = 'all';
+        
+        // Helper Functions
+        function getStatusConfig(status) {
+            const configs = {
+                completed: { icon: 'check', class: 'status-completed', label: 'Completed', color: '#4CAF50' },
+                inprogress: { icon: 'clock', class: 'status-inprogress', label: 'In Progress', color: '#FF9800' },
+                available: { icon: 'circle', class: 'status-available', label: 'Available', color: '#2196F3' },
+                locked: { icon: 'lock', class: 'status-locked', label: 'Locked', color: '#9E9E9E' }
+            };
+            return configs[status] || configs.locked;
+        }
+        
+        function getCategoryConfig(category) {
+            const configs = {
+                core: { class: 'category-core', label: 'Core' },
+                elective: { class: 'category-elective', label: 'Elective' },
+                project: { class: 'category-project', label: 'Project' },
+                english: { class: 'category-english', label: 'English' },
+                general: { class: 'category-general', label: 'General Ed' },
+                university: { class: 'category-university', label: 'University' }
+            };
+            return configs[category] || configs.core;
+        }
+        
+        function createCourseCard(course, index) {
+            const statusConfig = getStatusConfig(course.status);
+            const categoryConfig = getCategoryConfig(course.category);
+            const staggerDelay = index * 0.05;
+            
+            return `
+                <div class="course-card bg-white rounded-xl p-4 shadow-md cursor-pointer stagger-card" 
+                     style="animation-delay: ${staggerDelay}s"
+                     onclick="viewCourseDetail('${course.id}')"
+                     data-status="${course.status}"
+                     data-category="${course.category}">
+                    <div class="flex items-start justify-between mb-2">
+                        <span class="text-xs font-mono text-text-muted">${course.code}</span>
+                        <span class="px-2 py-1 rounded-md text-xs font-medium ${categoryConfig.class}">${categoryConfig.label}</span>
+                    </div>
+                    <h4 class="font-semibold text-text-primary text-sm mb-2 line-clamp-2">${course.name}</h4>
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs text-text-muted">${course.credits} cr</span>
+                        <div class="flex items-center space-x-1 ${statusConfig.class} px-2 py-1 rounded-md">
+                            <i data-lucide="${statusConfig.icon}" class="w-3 h-3"></i>
+                            <span class="text-xs font-medium">${statusConfig.label}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function renderCourseGrid(year) {
+            const yearData = coursesData[`year${year}`];
+            const container = document.getElementById('courseGrid');
+            
+            let html = '';
+            
+            // Autumn Semester
+            if (yearData.autumn && yearData.autumn.length > 0) {
+                const filteredAutumn = currentFilter === 'all' 
+                    ? yearData.autumn 
+                    : yearData.autumn.filter(c => c.status === currentFilter);
+                
+                html += `
+                    <div class="semester-section pl-4">
+                        <h3 class="text-lg font-semibold text-text-primary mb-4 flex items-center">
+                            <i data-lucide="calendar" class="w-5 h-5 mr-2 text-hkmu-blue"></i>
+                            Autumn Semester
+                        </h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                            ${filteredAutumn.map((course, i) => createCourseCard(course, i)).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Spring Semester
+            if (yearData.spring && yearData.spring.length > 0) {
+                const filteredSpring = currentFilter === 'all' 
+                    ? yearData.spring 
+                    : yearData.spring.filter(c => c.status === currentFilter);
+                
+                html += `
+                    <div class="semester-section semester-spring pl-4">
+                        <h3 class="text-lg font-semibold text-text-primary mb-4 flex items-center">
+                            <i data-lucide="calendar" class="w-5 h-5 mr-2 text-hkmu-green"></i>
+                            Spring Semester
+                        </h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                            ${filteredSpring.map((course, i) => createCourseCard(course, i + (yearData.autumn?.length || 0))).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Summer Semester (Year 3 only)
+            if (yearData.summer && yearData.summer.length > 0) {
+                const filteredSummer = currentFilter === 'all' 
+                    ? yearData.summer 
+                    : yearData.summer.filter(c => c.status === currentFilter);
+                
+                html += `
+                    <div class="semester-section semester-summer pl-4">
+                        <h3 class="text-lg font-semibold text-text-primary mb-4 flex items-center">
+                            <i data-lucide="calendar" class="w-5 h-5 mr-2 text-warning-orange"></i>
+                            Summer Semester
+                        </h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                            ${filteredSummer.map((course, i) => createCourseCard(course, i)).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            container.innerHTML = html;
+            lucide.createIcons();
+        }
+        
+        function renderElectiveTable() {
+            const tbody = document.getElementById('electiveTableBody');
+            
+            tbody.innerHTML = electiveCourses.map(course => {
+                const statusConfig = getStatusConfig(course.status);
+                return `
+                    <tr class="hover:bg-gray-50 transition-colors cursor-pointer" onclick="viewCourseDetail('${course.id}')">
+                        <td class="px-6 py-4 text-sm font-mono text-text-secondary">${course.code}</td>
+                        <td class="px-6 py-4 text-sm font-medium text-text-primary">${course.name}</td>
+                        <td class="px-6 py-4 text-sm text-center text-text-secondary">${course.credits}</td>
+                        <td class="px-6 py-4 text-sm text-text-secondary">${course.prerequisites}</td>
+                        <td class="px-6 py-4 text-center">
+                            <span class="inline-flex items-center space-x-1 ${statusConfig.class} px-3 py-1 rounded-full text-xs font-medium">
+                                <i data-lucide="${statusConfig.icon}" class="w-3 h-3"></i>
+                                <span>${statusConfig.label}</span>
+                            </span>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+            
+            lucide.createIcons();
+        }
+        
+        function calculateStats() {
+            let completed = 0, inProgress = 0, available = 0, locked = 0;
+            let completedCredits = 0, inProgressCredits = 0;
+            const categoryEarned = { core: 0, elective: 0, project: 0, english: 0, general: 0, university: 0 };
+            
+            // Process all courses
+            Object.values(coursesData).forEach(year => {
+                Object.values(year).forEach(semester => {
+                    semester.forEach(course => {
+                        if (course.status === 'completed') {
+                            completed++;
+                            completedCredits += course.credits;
+                            if (categoryEarned[course.category] !== undefined) {
+                                categoryEarned[course.category] += course.credits;
+                            }
+                        } else if (course.status === 'inprogress') {
+                            inProgress++;
+                            inProgressCredits += course.credits;
+                        } else if (course.status === 'available') {
+                            available++;
+                        } else {
+                            locked++;
+                        }
+                    });
+                });
+            });
+            
+            // Process elective courses
+            electiveCourses.forEach(course => {
+                if (course.status === 'completed') {
+                    completed++;
+                    completedCredits += course.credits;
+                    categoryEarned.elective += course.credits;
+                } else if (course.status === 'inprogress') {
+                    inProgress++;
+                    inProgressCredits += course.credits;
+                } else if (course.status === 'available') {
+                    available++;
+                } else {
+                    locked++;
+                }
+            });
+            
+            return { completed, inProgress, available, locked, completedCredits, inProgressCredits, categoryEarned };
+        }
+        
+        function animateCounter(elementId, targetValue, duration = 1000) {
+            const element = document.getElementById(elementId);
+            const startValue = 0;
+            const startTime = performance.now();
+            
+            function updateCounter(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const easeProgress = 1 - Math.pow(1 - progress, 3); // Ease out cubic
+                const currentValue = Math.round(startValue + (targetValue - startValue) * easeProgress);
+                
+                element.textContent = currentValue;
+                
+                if (progress < 1) {
+                    requestAnimationFrame(updateCounter);
+                }
+            }
+            
+            requestAnimationFrame(updateCounter);
+        }
+        
+        function updateStats() {
+            const stats = calculateStats();
+            const remainingCredits = 120 - stats.completedCredits - stats.inProgressCredits;
+            const progressPercentage = Math.round((stats.completedCredits / 120) * 100);
+            
+            // Animate counters
+            animateCounter('completedCredits', stats.completedCredits);
+            animateCounter('inProgressCredits', stats.inProgressCredits);
+            animateCounter('remainingCredits', remainingCredits);
+            animateCounter('completedCount', stats.completed);
+            animateCounter('inProgressCount', stats.inProgress);
+            animateCounter('availableCount', stats.available);
+            animateCounter('lockedCount', stats.locked);
+            
+            // Update progress bar
+            setTimeout(() => {
+                document.getElementById('overallProgressBar').style.width = `${progressPercentage}%`;
+                document.getElementById('progressPercentage').textContent = `${progressPercentage}%`;
+            }, 300);
+            
+            // Update category progress
+            Object.keys(stats.categoryEarned).forEach(category => {
+                const earned = stats.categoryEarned[category];
+                const total = categoryTotals[category];
+                const percentage = Math.min((earned / total) * 100, 100);
+                
+                // Update earned text
+                document.querySelectorAll(`[data-category="${category}"]`).forEach(el => {
+                    el.textContent = earned;
+                });
+                
+                // Update progress bar
+                const progressBar = document.querySelector(`.category-progress-bar.bg-${getCategoryColorClass(category)}`);
+                if (progressBar) {
+                    setTimeout(() => {
+                        progressBar.style.width = `${percentage}%`;
+                    }, 500);
+                }
+            });
+        }
+        
+        function getCategoryColorClass(category) {
+            const colorMap = {
+                core: 'core-blue',
+                elective: 'elective-purple',
+                project: 'project-amber',
+                english: 'english-emerald',
+                general: 'general-pink',
+                university: 'university-indigo'
+            };
+            return colorMap[category];
+        }
+        
+        function viewCourseDetail(courseId) {
+            // Navigate to course detail page
+            window.location.href = `/course/${courseId}`;
+        }
+        
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mobile Menu Toggle
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const closeMobileMenu = document.getElementById('closeMobileMenu');
+            const mobileMenu = document.getElementById('mobileMenu');
+            
+            mobileMenuBtn.addEventListener('click', () => {
+                mobileMenu.classList.add('open');
+            });
+            
+            closeMobileMenu.addEventListener('click', () => {
+                mobileMenu.classList.remove('open');
+            });
+            
+            // Year Tabs
+            document.querySelectorAll('.year-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.year-tab').forEach(t => {
+                        t.classList.remove('active');
+                        t.classList.add('text-text-secondary');
+                    });
+                    tab.classList.add('active');
+                    tab.classList.remove('text-text-secondary');
+                    
+                    currentYear = parseInt(tab.dataset.year);
+                    renderCourseGrid(currentYear);
+                });
+            });
+            
+            // Status Filters
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.filter-btn').forEach(b => {
+                        b.classList.remove('active');
+                        b.classList.add('text-text-secondary');
+                    });
+                    btn.classList.add('active');
+                    btn.classList.remove('text-text-secondary');
+                    
+                    currentFilter = btn.dataset.filter;
+                    renderCourseGrid(currentYear);
+                });
+            });
+            
+            // Initialize
+            renderCourseGrid(1);
+            renderElectiveTable();
+            updateStats();
+        });
+    </script>
+</body>
+</html>
