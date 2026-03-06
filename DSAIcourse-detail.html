@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Course Detail - HKMU DSAI Course Planner</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>tailwind.config={theme:{extend:{colors:{'hkmu-blue':'#0066CC','hkmu-green':'#2E7D52','page-bg':'#F5F7FA'}}}}</script>
+<style>
+body{font-family:'Inter',sans-serif;background:#F5F7FA}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.animate-fade-in{animation:fadeIn .4s ease-out forwards}
+.tab-content{display:none}.tab-content.active{display:block;animation:fadeIn .3s ease-out}
+.modal-overlay{opacity:0;visibility:hidden;transition:all .3s ease}.modal-overlay.active{opacity:1;visibility:visible}
+.modal-content{transform:scale(.95) translateY(10px);transition:all .3s ease}.modal-overlay.active .modal-content{transform:scale(1) translateY(0)}
+.star-rating{display:flex;gap:4px}.star-rating .star{cursor:pointer;transition:all .2s}.star.filled{color:#FFC107}.star.empty{color:#E0E0E0}
+.drop-zone{border:2px dashed #CBD5E1;transition:all .3s ease}.drop-zone.drag-over{border-color:#0066CC;background:rgba(0,102,204,.05)}
+.progress-bar{height:4px;background:#E5E7EB;border-radius:2px;overflow:hidden}.progress-bar-fill{height:100%;background:linear-gradient(90deg,#0066CC,#2E7D52);border-radius:2px;transition:width .3s}
+.btn-hover{transition:all .2s}.btn-hover:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.15)}
+.card-hover{transition:all .3s}.card-hover:hover{transform:translateY(-4px);box-shadow:0 12px 24px rgba(0,0,0,.1)}
+.status-badge{transition:all .3s}.review-card{transition:all .3s}.review-card:hover{background:#FAFAFA}
+.material-card{transition:all .3s;border:1px solid #e5e7eb}.material-card:hover{border-color:#0066CC}
+.toast{position:fixed;bottom:24px;right:24px;padding:16px 24px;background:white;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.15);display:flex;align-items:center;gap:12px;transform:translateX(150%);transition:transform .4s cubic-bezier(.175,.885,.32,1.275);z-index:1000}
+.toast.show{transform:translateX(0)}.toast.success{border-left:4px solid #4CAF50}.toast.error{border-left:4px solid #EF4444}.toast.info{border-left:4px solid #2196F3}
+</style>
+</head>
+<body class="bg-page-bg min-h-screen">
+<nav class="bg-white shadow-md sticky top-0 z-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between h-16 items-center">
+    <a href="index.html" class="flex items-center gap-3"><div class="w-10 h-10 bg-hkmu-blue rounded-lg flex items-center justify-center"><i data-lucide="graduation-cap" class="w-6 h-6 text-white"></i></div><div class="hidden sm:block"><span class="text-lg font-bold text-gray-900">HKMU</span><span class="text-sm text-gray-600 block -mt-1">DSAI Planner</span></div></a>
+    <div class="hidden md:flex items-center space-x-1">
+      <a href="index.html" class="px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-hkmu-blue flex items-center gap-2"><i data-lucide="layout-dashboard" class="w-4 h-4"></i>Dashboard</a>
+      <a href="index.html" class="px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-hkmu-blue flex items-center gap-2"><i data-lucide="book-open" class="w-4 h-4"></i>Courses</a>
+      <a href="index.html" class="px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-hkmu-blue flex items-center gap-2"><i data-lucide="calendar" class="w-4 h-4"></i>Study Plan</a>
+    </div>
+    <div class="flex items-center gap-3">
+      <button class="p-2 rounded-lg text-gray-500 hover:bg-gray-100 relative"><i data-lucide="bell" class="w-5 h-5"></i><span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span></button>
+      <div class="flex items-center gap-2 pl-3 border-l border-gray-200"><div class="w-8 h-8 bg-hkmu-green rounded-full flex items-center justify-center"><span class="text-white text-sm font-medium">JS</span></div><span class="hidden sm:block text-sm font-medium text-gray-700">John Smith</span></div>
+      <button id="mobile-menu-btn" class="p-2 rounded-lg text-gray-500 hover:bg-gray-100 md:hidden"><i data-lucide="menu" class="w-6 h-6"></i></button>
+    </div>
+  </div>
+  <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-100 px-4 py-3 space-y-1">
+    <a href="index.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-100"><i data-lucide="layout-dashboard" class="w-5 h-5"></i>Dashboard</a>
+    <a href="index.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-100"><i data-lucide="book-open" class="w-5 h-5"></i>Courses</a>
+    <a href="index.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-100"><i data-lucide="calendar" class="w-5 h-5"></i>Study Plan</a>
+  </div>
+</nav>
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+  <nav class="mb-6 animate-fade-in"><ol class="flex items-center gap-2 text-sm">
+    <li><a href="index.html" class="text-gray-500 hover:text-hkmu-blue flex items-center gap-1"><i data-lucide="home" class="w-4 h-4"></i>Home</a></li>
+    <li class="text-gray-400"><i data-lucide="chevron-right" class="w-4 h-4"></i></li>
+    <li><a href="index.html" class="text-gray-500 hover:text-hkmu-blue">Degree Progress</a></li>
+    <li class="text-gray-400"><i data-lucide="chevron-right" class="w-4 h-4"></i></li>
+    <li><span id="breadcrumb-course-code" class="text-hkmu-blue font-medium">Loading...</span></li>
+  </ol></nav>
+  <section class="mb-6 animate-fade-in">
+    <div class="bg-white rounded-2xl shadow-sm p-6 sm:p-8">
+      <div class="mb-4"><span id="course-status-badge" class="status-badge inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium"><span id="status-icon"></span><span id="status-text">Loading...</span></span></div>
+      <div class="mb-4"><h2 id="course-code" class="text-3xl font-bold text-gray-900 mb-2">Loading...</h2><h1 id="course-name" class="text-2xl font-semibold text-gray-700">Loading...</h1></div>
+      <div class="flex flex-wrap gap-2">
+        <span id="category-tag" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-gray-100 text-gray-700"><i data-lucide="tag" class="w-4 h-4"></i><span id="category-text">Category</span></span>
+        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-gray-100 text-gray-700"><i data-lucide="award" class="w-4 h-4"></i><span id="credits-text">0 Credits</span></span>
+        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-gray-100 text-gray-700"><i data-lucide="calendar-days" class="w-4 h-4"></i><span id="semester-text">Year 0, Semester 0</span></span>
+      </div>
+    </div>
+  </section>
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+    <section class="lg:col-span-2 animate-fade-in">
+      <div class="bg-white rounded-2xl shadow-sm p-6 h-full">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2"><i data-lucide="info" class="w-5 h-5 text-hkmu-blue"></i>Course Information</h3>
+        <div class="mb-6"><h4 class="text-sm font-medium text-gray-500 mb-2">Description</h4><p id="course-description" class="text-gray-700 leading-relaxed">Loading...</p></div>
+        <div class="mb-6"><h4 class="text-sm font-medium text-gray-500 mb-2">Prerequisites</h4><div id="prerequisites-list" class="flex flex-wrap gap-2"></div></div>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div class="bg-gray-50 rounded-xl p-4 text-center"><i data-lucide="layers" class="w-6 h-6 text-hkmu-blue mx-auto mb-2"></i><p class="text-xs text-gray-500">Category</p><p id="info-category" class="font-medium text-gray-900">-</p></div>
+          <div class="bg-gray-50 rounded-xl p-4 text-center"><i data-lucide="award" class="w-6 h-6 text-hkmu-green mx-auto mb-2"></i><p class="text-xs text-gray-500">Credits</p><p id="info-credits" class="font-medium text-gray-900">-</p></div>
+          <div class="bg-gray-50 rounded-xl p-4 text-center"><i data-lucide="calendar" class="w-6 h-6 text-orange-500 mx-auto mb-2"></i><p class="text-xs text-gray-500">Semester</p><p id="info-semester" class="font-medium text-gray-900">-</p></div>
+          <div class="bg-gray-50 rounded-xl p-4 text-center"><i data-lucide="clock" class="w-6 h-6 text-blue-500 mx-auto mb-2"></i><p class="text-xs text-gray-500">Duration</p><p class="font-medium text-gray-900">16 weeks</p></div>
+        </div>
+      </div>
+    </section>
+    <section class="animate-fade-in">
+      <div class="bg-white rounded-2xl shadow-sm p-6 h-full">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2"><i data-lucide="settings" class="w-5 h-5 text-hkmu-blue"></i>Update Status</h3>
+        <div class="space-y-3">
+          <button id="btn-completed" onclick="updateStatus('completed')" class="btn-hover w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-green-50 text-green-700 border-2 border-green-200 hover:bg-green-100 transition-all"><div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center"><i data-lucide="check-circle" class="w-5 h-5"></i></div><div class="text-left"><p class="font-medium">Mark as Completed</p><p class="text-xs text-green-600">Course finished</p></div></button>
+          <button id="btn-in-progress" onclick="updateStatus('in-progress')" class="btn-hover w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-orange-50 text-orange-700 border-2 border-orange-200 hover:bg-orange-100 transition-all"><div class="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center"><i data-lucide="clock" class="w-5 h-5"></i></div><div class="text-left"><p class="font-medium">Mark as In Progress</p><p class="text-xs text-orange-600">Currently studying</p></div></button>
+          <button onclick="updateStatus('available')" class="btn-hover w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-gray-50 text-gray-700 border-2 border-gray-200 hover:bg-gray-100 transition-all"><div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center"><i data-lucide="refresh-cw" class="w-5 h-5"></i></div><div class="text-left"><p class="font-medium">Reset Status</p><p class="text-xs text-gray-500">Back to available</p></div></button>
+        </div>
+        <div class="mt-4 p-4 bg-gray-50 rounded-xl"><p class="text-sm text-gray-500 mb-1">Current Status</p><p id="current-status-display" class="font-medium text-gray-900">Available</p></div>
+      </div>
+    </section>
+  </div>
+  <section class="animate-fade-in">
+    <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
+      <div class="border-b border-gray-200 flex">
+        <button id="tab-reviews" onclick="switchTab('reviews')" class="flex-1 sm:flex-none px-6 py-4 text-sm font-medium border-b-2 border-hkmu-blue text-hkmu-blue flex items-center justify-center gap-2"><i data-lucide="message-square" class="w-4 h-4"></i>Reviews<span id="reviews-count" class="ml-1 px-2 py-0.5 bg-hkmu-blue text-white text-xs rounded-full">0</span></button>
+        <button id="tab-materials" onclick="switchTab('materials')" class="flex-1 sm:flex-none px-6 py-4 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 flex items-center justify-center gap-2"><i data-lucide="file-text" class="w-4 h-4"></i>Study Materials<span id="materials-count" class="ml-1 px-2 py-0.5 bg-gray-200 text-gray-600 text-xs rounded-full">0</span></button>
+      </div>
+      <div id="content-reviews" class="tab-content active p-6">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+          <div class="flex items-center gap-4"><div id="average-stars" class="star-rating text-2xl"></div><span id="average-rating" class="text-2xl font-bold text-gray-900">0.0</span><span id="total-reviews" class="text-gray-500">(0 reviews)</span></div>
+          <button onclick="openReviewModal()" class="btn-hover px-4 py-2.5 bg-hkmu-blue text-white rounded-lg font-medium flex items-center gap-2 hover:bg-blue-700"><i data-lucide="edit-3" class="w-4 h-4"></i>Write a Review</button>
+        </div>
+        <div id="reviews-list" class="space-y-4"></div>
+        <div id="reviews-empty" class="hidden text-center py-12"><div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4"><i data-lucide="message-circle" class="w-8 h-8 text-gray-400"></i></div><h4 class="text-lg font-medium mb-2">No reviews yet</h4><p class="text-gray-500 mb-4">Be the first to share your experience!</p><button onclick="openReviewModal()" class="px-4 py-2 bg-hkmu-blue text-white rounded-lg font-medium hover:bg-blue-700">Write a Review</button></div>
+      </div>
+      <div id="content-materials" class="tab-content p-6">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+          <div><h4 class="text-lg font-medium">Shared Study Materials</h4><p class="text-sm text-gray-500">Access notes, assignments, and past papers shared by students</p></div>
+          <button onclick="openUploadModal()" class="btn-hover px-4 py-2.5 bg-hkmu-green text-white rounded-lg font-medium flex items-center gap-2 hover:bg-green-700"><i data-lucide="upload" class="w-4 h-4"></i>Upload Material</button>
+        </div>
+        <div id="materials-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+        <div id="materials-empty" class="hidden text-center py-12"><div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4"><i data-lucide="folder-open" class="w-8 h-8 text-gray-400"></i></div><h4 class="text-lg font-medium mb-2">No materials yet</h4><button onclick="openUploadModal()" class="px-4 py-2 bg-hkmu-green text-white rounded-lg font-medium hover:bg-green-700">Upload Material</button></div>
+      </div>
+    </div>
+  </section>
+</main>
+<div id="review-modal" class="modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+  <div class="modal-content bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-hidden">
+    <div class="px-6 py-4 border-b flex items-center justify-between"><h3 class="text-lg font-semibold">Write a Review</h3><button onclick="closeReviewModal()" class="p-2 rounded-lg text-gray-400 hover:bg-gray-100"><i data-lucide="x" class="w-5 h-5"></i></button></div>
+    <div class="px-6 py-4 overflow-y-auto max-h-[60vh]">
+      <div class="mb-6"><label class="block text-sm font-medium text-gray-700 mb-2">Your Rating</label>
+        <div id="rating-selector" class="star-rating interactive text-3xl">
+          <span class="star empty" data-rating="1" onclick="setRating(1)"><i data-lucide="star" class="w-8 h-8 fill-current"></i></span>
+          <span class="star empty" data-rating="2" onclick="setRating(2)"><i data-lucide="star" class="w-8 h-8 fill-current"></i></span>
+          <span class="star empty" data-rating="3" onclick="setRating(3)"><i data-lucide="star" class="w-8 h-8 fill-current"></i></span>
+          <span class="star empty" data-rating="4" onclick="setRating(4)"><i data-lucide="star" class="w-8 h-8 fill-current"></i></span>
+          <span class="star empty" data-rating="5" onclick="setRating(5)"><i data-lucide="star" class="w-8 h-8 fill-current"></i></span>
+        </div>
+        <p id="rating-text" class="text-sm text-gray-500 mt-1">Click to rate</p><input type="hidden" id="rating-value" value="0">
+      </div>
+      <div class="mb-4"><label class="block text-sm font-medium text-gray-700 mb-2">Semester Taken</label>
+        <select id="review-semester" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-hkmu-blue outline-none"><option value="">Select semester...</option><option value="2024 Autumn">2024 Autumn</option><option value="2024 Spring">2024 Spring</option><option value="2023 Autumn">2023 Autumn</option><option value="2023 Spring">2023 Spring</option><option value="2022 Autumn">2022 Autumn</option><option value="2022 Spring">2022 Spring</option></select>
+      </div>
+      <div class="mb-4"><label class="block text-sm font-medium text-gray-700 mb-2">Your Review</label>
+        <textarea id="review-text" rows="4" minlength="50" maxlength="1000" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-hkmu-blue outline-none resize-none" placeholder="Share your experience (min 50 characters)" oninput="updateCharCount(this)"></textarea>
+        <div class="flex justify-between mt-1"><span id="char-count" class="text-xs text-gray-400">0 / 1000</span><span class="text-xs text-gray-400">Min 50 chars</span></div>
+      </div>
+      <div class="flex items-center gap-2"><input type="checkbox" id="review-anonymous" class="w-4 h-4 text-hkmu-blue border-gray-300 rounded"><label for="review-anonymous" class="text-sm text-gray-700">Post anonymously</label></div>
+    </div>
+    <div class="px-6 py-4 border-t bg-gray-50 flex justify-end gap-3"><button onclick="closeReviewModal()" class="px-4 py-2 text-gray-700 hover:bg-gray-200 rounded-lg">Cancel</button><button onclick="submitReview(event)" class="px-4 py-2 bg-hkmu-blue text-white rounded-lg font-medium hover:bg-blue-700">Submit Review</button></div>
+  </div>
+</div>
+<div id="upload-modal" class="modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+  <div class="modal-content bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-hidden">
+    <div class="px-6 py-4 border-b flex items-center justify-between"><h3 class="text-lg font-semibold">Upload Study Material</h3><button onclick="closeUploadModal()" class="p-2 rounded-lg text-gray-400 hover:bg-gray-100"><i data-lucide="x" class="w-5 h-5"></i></button></div>
+    <div class="px-6 py-4 overflow-y-auto max-h-[60vh]">
+      <div id="drop-zone" class="drop-zone rounded-xl p-8 text-center mb-4"><input type="file" id="file-input" class="hidden" accept=".pdf,.doc,.docx,.ppt,.pptx,.zip" onchange="handleFileSelect(event)"><div class="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4"><i data-lucide="upload-cloud" class="w-8 h-8 text-hkmu-blue"></i></div><p class="text-gray-700 font-medium mb-1">Drag & drop your file here</p><p class="text-sm text-gray-500 mb-3">or</p><button type="button" onclick="document.getElementById('file-input').click()" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">Browse Files</button><p class="text-xs text-gray-400 mt-3">PDF, DOC, DOCX, PPT, PPTX, ZIP (max 50MB)</p></div>
+      <div id="file-info" class="hidden mb-4 p-4 bg-gray-50 rounded-lg"><div class="flex items-center gap-3"><div id="file-icon" class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center"><i data-lucide="file" class="w-5 h-5 text-hkmu-blue"></i></div><div class="flex-1 min-w-0"><p id="file-name" class="font-medium text-gray-900 truncate">filename.pdf</p><p id="file-size" class="text-sm text-gray-500">0 MB</p></div><button type="button" onclick="clearFile()" class="p-2 text-gray-400 hover:text-red-500"><i data-lucide="x" class="w-4 h-4"></i></button></div><div id="upload-progress" class="hidden mt-3"><div class="progress-bar"><div id="progress-fill" class="progress-bar-fill" style="width:0%"></div></div><p id="progress-text" class="text-xs text-gray-500 mt-1 text-center">0%</p></div></div>
+      <div class="mb-4"><label class="block text-sm font-medium text-gray-700 mb-2">Category</label><select id="material-category" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-hkmu-blue outline-none"><option value="">Select category...</option><option value="lectureNote">Lecture Notes</option><option value="tutorialNote">Tutorial Notes</option><option value="assignment">Assignments</option><option value="pastPaper">Past Papers</option><option value="mockpaper">Mock Papers</option><option value="other">Other</option></select></div>
+      <div class="mb-4"><label class="block text-sm font-medium text-gray-700 mb-2">Description (Optional)</label><textarea id="material-description" rows="2" maxlength="200" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-hkmu-blue outline-none resize-none" placeholder="Brief description..."></textarea></div>
+    </div>
+    <div class="px-6 py-4 border-t bg-gray-50 flex justify-end gap-3"><button onclick="closeUploadModal()" class="px-4 py-2 text-gray-700 hover:bg-gray-200 rounded-lg">Cancel</button><button id="upload-submit-btn" onclick="submitUpload(event)" class="px-4 py-2 bg-hkmu-green text-white rounded-lg font-medium hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed" disabled>Upload</button></div>
+  </div>
+</div>
+<div id="toast" class="toast"><i id="toast-icon" data-lucide="check-circle" class="w-5 h-5"></i><span id="toast-message">Operation successful</span></div>
+<script>
+const coursesData = {
+  'COMP1080SEF':{code:'COMP1080SEF',name:'Programming Fundamentals',description:'This course introduces the fundamental concepts of computer programming, including problem-solving techniques, algorithm design, and implementation using a high-level programming language. Students will learn about data types, control structures, functions, arrays, and basic object-oriented programming concepts. The course emphasizes practical programming skills through hands-on exercises and projects.',category:'Core',credits:5,year:1,semester:1,status:'available',prerequisites:[]},
+  'COMP2020SEF':{code:'COMP2020SEF',name:'Data Structures and Algorithms',description:'This course covers fundamental data structures including arrays, linked lists, stacks, queues, trees, and graphs. Students will learn various algorithms for searching, sorting, and graph traversal, with analysis of time and space complexity. The course emphasizes the selection and implementation of appropriate data structures for solving computational problems efficiently.',category:'Core',credits:5,year:2,semester:1,status:'in-progress',prerequisites:['COMP1080SEF']},
+  'COMP3030SEF':{code:'COMP3030SEF',name:'Machine Learning',description:'This course provides a comprehensive introduction to machine learning concepts and techniques. Topics include supervised learning, unsupervised learning, neural networks, deep learning, and reinforcement learning. Students will implement various algorithms and apply them to real-world datasets using popular machine learning frameworks.',category:'Advanced',credits:5,year:3,semester:2,status:'locked',prerequisites:['COMP2020SEF','MATH2010SEF']},
+  'MATH2010SEF':{code:'MATH2010SEF',name:'Linear Algebra for Data Science',description:'This course covers essential linear algebra concepts for data science applications. Topics include vectors, matrices, linear transformations, eigenvalues, eigenvectors, and matrix decomposition techniques. The course emphasizes the application of linear algebra in machine learning and data analysis.',category:'Foundation',credits:5,year:2,semester:1,status:'completed',prerequisites:['MATH1010SEF']}
+};
+let reviewsData = JSON.parse(localStorage.getItem('courseReviews')) || {'COMP1080SEF':[{id:1,author:'Alice Wong',year:'Year 2',semester:'2023 Autumn',rating:5,content:'Excellent introductory course! The professor explains concepts very clearly and the assignments are well-designed to reinforce learning. I especially enjoyed the final project where we built a simple game. Highly recommended for beginners!',helpful:24,date:'2023-12-15',isAnonymous:false},{id:2,author:'Anonymous',year:'Year 1',semester:'2023 Autumn',rating:4,content:'Good course overall. The content is well-structured but the pace can be a bit fast for complete beginners. Make sure to practice outside of class hours. The tutorial sessions are very helpful.',helpful:15,date:'2023-12-10',isAnonymous:true}],'COMP2020SEF':[{id:3,author:'Bob Chen',year:'Year 3',semester:'2024 Spring',rating:5,content:'One of the most important courses for CS students. The algorithms covered are fundamental and the professor does a great job explaining complex concepts. The problem sets are challenging but rewarding.',helpful:18,date:'2024-05-20',isAnonymous:false}],'MATH2010SEF':[{id:4,author:'Carol Lee',year:'Year 2',semester:'2023 Spring',rating:4,content:'Solid math foundation course. The connection to data science applications makes it more interesting than traditional linear algebra courses. Some proofs can be challenging but the tutorials help a lot.',helpful:12,date:'2023-06-10',isAnonymous:false}]};
+let materialsData = JSON.parse(localStorage.getItem('courseMaterials')) || {'COMP1080SEF':[{id:1,filename:'Lecture_Notes_Week1-8.pdf',type:'pdf',category:'lectureNote',description:'Complete lecture notes for weeks 1-8, including all code examples',uploader:'StudyGroup2023',size:'4.2 MB',downloads:156,date:'2023-11-01'},{id:2,filename:'Assignment_Solutions.zip',type:'zip',category:'assignment',description:'Sample solutions for all assignments (for reference only)',uploader:'Anonymous',size:'12.5 MB',downloads:89,date:'2023-12-05'}],'COMP2020SEF':[{id:3,filename:'Algorithm_Cheat_Sheet.pdf',type:'pdf',category:'tutorialNote',description:'Quick reference guide for common algorithms and their complexities',uploader:'AlgoMaster',size:'1.8 MB',downloads:234,date:'2024-03-15'}]};
+let currentCourseId=null, currentCourse=null, currentRating=0, selectedFile=null;
+
+document.addEventListener('DOMContentLoaded',function(){
+  lucide.createIcons();
+  const p=new URLSearchParams(window.location.search); currentCourseId=p.get('id')||'COMP1080SEF';
+  loadCourseData(); setupDragAndDrop();
+  document.getElementById('mobile-menu-btn').addEventListener('click',()=>document.getElementById('mobile-menu').classList.toggle('hidden'));
+  document.getElementById('review-modal').addEventListener('click',e=>{if(e.target===document.getElementById('review-modal'))closeReviewModal();});
+  document.getElementById('upload-modal').addEventListener('click',e=>{if(e.target===document.getElementById('upload-modal'))closeUploadModal();});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeReviewModal();closeUploadModal();}});
+});
+
+function loadCourseData() {
+  const saved=JSON.parse(localStorage.getItem('courseStatuses')||'{}');
+  currentCourse=coursesData[currentCourseId]; if(!currentCourse){showToast('Course not found','error');return;}
+  if(saved[currentCourseId]) currentCourse.status=saved[currentCourseId];
+  document.getElementById('breadcrumb-course-code').textContent=currentCourse.code;
+  document.getElementById('course-code').textContent=currentCourse.code;
+  document.getElementById('course-name').textContent=currentCourse.name;
+  updateStatusBadge(currentCourse.status);
+  document.getElementById('category-text').textContent=currentCourse.category;
+  document.getElementById('credits-text').textContent=`${currentCourse.credits} Credits`;
+  document.getElementById('semester-text').textContent=`Year ${currentCourse.year}, Semester ${currentCourse.semester}`;
+  document.getElementById('course-description').textContent=currentCourse.description;
+  document.getElementById('info-category').textContent=currentCourse.category;
+  document.getElementById('info-credits').textContent=currentCourse.credits;
+  document.getElementById('info-semester').textContent=`Y${currentCourse.year}S${currentCourse.semester}`;
+  const prereqList=document.getElementById('prerequisites-list');
+  prereqList.innerHTML=currentCourse.prerequisites.length?currentCourse.prerequisites.map(p=>`<a href="?id=${p}" class="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-50 text-hkmu-blue rounded-lg text-sm font-medium hover:bg-blue-100"><i data-lucide="link" class="w-3 h-3"></i>${p}</a>`).join(''):'<span class="text-gray-500 text-sm">No prerequisites</span>';
+  updateStatusDisplay(currentCourse.status); loadReviews(); loadMaterials(); lucide.createIcons();
+}
+
+const statusCfg={completed:{bg:'bg-green-100',text:'text-green-700',icon:'check-circle',label:'Completed'},'in-progress':{bg:'bg-orange-100',text:'text-orange-700',icon:'clock',label:'In Progress'},available:{bg:'bg-blue-100',text:'text-blue-700',icon:'unlock',label:'Available'},locked:{bg:'bg-gray-100',text:'text-gray-700',icon:'lock',label:'Locked'}};
+function updateStatusBadge(status) { const cfg=statusCfg[status]||statusCfg.available; document.getElementById('course-status-badge').className=`status-badge inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium ${cfg.bg} ${cfg.text}`; document.getElementById('status-icon').innerHTML=`<i data-lucide="${cfg.icon}" class="w-4 h-4"></i>`; document.getElementById('status-text').textContent=cfg.label; }
+function updateStatusDisplay(status) { document.getElementById('current-status-display').textContent=statusCfg[status]?.label||'Available'; document.getElementById('btn-completed').classList.toggle('ring-2',status==='completed'); document.getElementById('btn-in-progress').classList.toggle('ring-2',status==='in-progress'); }
+function updateStatus(s) { if(!currentCourse)return; currentCourse.status=s; coursesData[currentCourseId].status=s; updateStatusBadge(s); updateStatusDisplay(s); localStorage.setItem('courseStatuses',JSON.stringify(Object.fromEntries(Object.entries(coursesData).map(([k,v])=>[k,v.status])))); showToast(`Status updated to ${s.replace('-',' ')}`,'success'); lucide.createIcons(); }
+function switchTab(tab) { ['reviews','materials'].forEach(t=>{ document.getElementById('tab-'+t).classList.toggle('border-hkmu-blue',t===tab); document.getElementById('tab-'+t).classList.toggle('text-hkmu-blue',t===tab); document.getElementById('tab-'+t).classList.toggle('text-gray-500',t!==tab); document.getElementById('content-'+t).classList.toggle('active',t===tab); }); }
+function renderStars(n) { return Array.from({length:5},(_,i)=>`<span class="star ${i<n?'filled':'empty'}"><i data-lucide="star" class="w-5 h-5 fill-current"></i></span>`).join(''); }
+function formatDate(d) { return new Date(d).toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'}); }
+function loadReviews() {
+  const reviews=reviewsData[currentCourseId]||[], avg=reviews.length?(reviews.reduce((s,r)=>s+r.rating,0)/reviews.length).toFixed(1):'0.0';
+  document.getElementById('reviews-count').textContent=reviews.length; document.getElementById('total-reviews').textContent=`(${reviews.length} reviews)`; document.getElementById('average-rating').textContent=avg;
+  document.getElementById('average-stars').innerHTML=renderStars(Math.round(parseFloat(avg)));
+  document.getElementById('reviews-empty').classList.toggle('hidden',reviews.length>0);
+  document.getElementById('reviews-list').innerHTML=reviews.map(r=>`<div class="review-card bg-gray-50 rounded-xl p-5"><div class="flex items-start justify-between mb-3"><div class="flex items-center gap-3"><div class="w-10 h-10 bg-hkmu-blue rounded-full flex items-center justify-center"><span class="text-white text-sm font-medium">${r.isAnonymous?'A':r.author.charAt(0)}</span></div><div><p class="font-medium text-gray-900">${r.isAnonymous?'Anonymous':r.author}</p><p class="text-sm text-gray-500">${r.year} • ${r.semester}</p></div></div><div class="star-rating">${renderStars(r.rating)}</div></div><p class="text-gray-700 mb-4 leading-relaxed">${r.content}</p><div class="flex items-center justify-between"><button onclick="markHelpful(${r.id})" class="flex items-center gap-2 text-sm text-gray-500 hover:text-hkmu-blue"><i data-lucide="thumbs-up" class="w-4 h-4"></i>Helpful (${r.helpful})</button><span class="text-sm text-gray-400">${formatDate(r.date)}</span></div></div>`).join('');
+  lucide.createIcons();
+}
+function loadMaterials() {
+  const mats=materialsData[currentCourseId]||[]; document.getElementById('materials-count').textContent=mats.length; document.getElementById('materials-empty').classList.toggle('hidden',mats.length>0);
+  const fi={'pdf':'file-text','doc':'file-text','docx':'file-text','ppt':'presentation','pptx':'presentation','zip':'file-archive'};
+  const cl={'lectureNote':'Lecture Notes','tutorialNote':'Tutorial Notes','assignment':'Assignment','pastPaper':'Past Paper','mockpaper':'Mock Paper','other':'Other'};
+  document.getElementById('materials-list').innerHTML=mats.map(m=>`<div class="material-card bg-white rounded-xl p-4 flex items-start gap-4"><div class="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center flex-shrink-0"><i data-lucide="${fi[m.type]||'file'}" class="w-6 h-6 text-hkmu-blue"></i></div><div class="flex-1 min-w-0"><div class="flex items-start justify-between gap-2"><div><p class="font-medium text-gray-900 truncate">${m.filename}</p><p class="text-sm text-gray-500 mt-1">${m.description||'No description'}</p></div><span class="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full flex-shrink-0">${cl[m.category]||'Other'}</span></div><div class="flex items-center gap-4 mt-3 text-sm text-gray-500"><span><i data-lucide="user" class="w-3 h-3 inline"></i> ${m.uploader}</span><span><i data-lucide="hard-drive" class="w-3 h-3 inline"></i> ${m.size}</span><span><i data-lucide="download" class="w-3 h-3 inline"></i> ${m.downloads}</span></div></div><button onclick="downloadMaterial(${m.id})" class="btn-hover p-2 bg-hkmu-blue text-white rounded-lg hover:bg-blue-700 flex-shrink-0"><i data-lucide="download" class="w-4 h-4"></i></button></div>`).join('');
+  lucide.createIcons();
+}
+function downloadMaterial(id) { const m=(materialsData[currentCourseId]||[]).find(m=>m.id===id); if(m){m.downloads++;localStorage.setItem('courseMaterials',JSON.stringify(materialsData));loadMaterials();showToast(`Downloading ${m.filename}...`,'info');setTimeout(()=>showToast('Download completed!','success'),1500);} }
+function markHelpful(id) { const r=(reviewsData[currentCourseId]||[]).find(r=>r.id===id); if(r){r.helpful++;localStorage.setItem('courseReviews',JSON.stringify(reviewsData));loadReviews();showToast('Marked as helpful!','success');} }
+function openReviewModal() { document.getElementById('review-modal').classList.add('active'); document.body.style.overflow='hidden'; lucide.createIcons(); }
+function closeReviewModal() { document.getElementById('review-modal').classList.remove('active'); document.body.style.overflow=''; document.getElementById('review-form')?document.getElementById('review-form').reset():null; setRating(0); document.getElementById('char-count').textContent='0 / 1000'; }
+function setRating(r) { currentRating=r; document.getElementById('rating-value').value=r; document.querySelectorAll('#rating-selector .star').forEach((s,i)=>{s.classList.toggle('filled',i<r);s.classList.toggle('empty',i>=r);}); document.getElementById('rating-text').textContent=['Click to rate','Poor','Fair','Good','Very Good','Excellent'][r]; }
+function updateCharCount(t) { document.getElementById('char-count').textContent=`${t.value.length} / 1000`; }
+function submitReview(e) {
+  e.preventDefault(); const rating=parseInt(document.getElementById('rating-value').value), semester=document.getElementById('review-semester').value, content=document.getElementById('review-text').value, anon=document.getElementById('review-anonymous').checked;
+  if(!rating){showToast('Please select a rating','error');return;} if(!semester){showToast('Please select a semester','error');return;} if(content.length<50){showToast('Review must be at least 50 characters','error');return;}
+  if(!reviewsData[currentCourseId]) reviewsData[currentCourseId]=[];
+  reviewsData[currentCourseId].unshift({id:Date.now(),author:anon?'Anonymous':'John Smith',year:'Year 2',semester,rating,content,helpful:0,date:new Date().toISOString().split('T')[0],isAnonymous:anon});
+  localStorage.setItem('courseReviews',JSON.stringify(reviewsData)); loadReviews(); closeReviewModal(); showToast('Review submitted successfully!','success');
+}
+function openUploadModal() { document.getElementById('upload-modal').classList.add('active'); document.body.style.overflow='hidden'; lucide.createIcons(); }
+function closeUploadModal() { document.getElementById('upload-modal').classList.remove('active'); document.body.style.overflow=''; clearFile(); }
+function setupDragAndDrop() {
+  const dz=document.getElementById('drop-zone');
+  ['dragenter','dragover','dragleave','drop'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();e.stopPropagation();}));
+  ['dragenter','dragover'].forEach(ev=>dz.addEventListener(ev,()=>dz.classList.add('drag-over')));
+  ['dragleave','drop'].forEach(ev=>dz.addEventListener(ev,()=>dz.classList.remove('drag-over')));
+  dz.addEventListener('drop',e=>{if(e.dataTransfer.files.length>0)handleFile(e.dataTransfer.files[0]);});
+}
+function handleFileSelect(e) { if(e.target.files.length>0) handleFile(e.target.files[0]); }
+function handleFile(f) {
+  const ext=f.name.split('.').pop().toLowerCase();
+  if(!['pdf','doc','docx','ppt','pptx','zip'].includes(ext)){showToast('Invalid file type.','error');return;}
+  if(f.size>50*1024*1024){showToast('File exceeds 50MB limit.','error');return;}
+  selectedFile=f; document.getElementById('file-name').textContent=f.name; document.getElementById('file-size').textContent=formatFileSize(f.size); document.getElementById('file-info').classList.remove('hidden');
+  document.getElementById('upload-submit-btn').disabled=false; lucide.createIcons();
+}
+function clearFile() { selectedFile=null; const fi=document.getElementById('file-input'); if(fi)fi.value=''; document.getElementById('file-info').classList.add('hidden'); document.getElementById('upload-submit-btn').disabled=true; document.getElementById('upload-progress').classList.add('hidden'); }
+function formatFileSize(b) { if(!b)return'0 Bytes'; const k=1024,s=['Bytes','KB','MB','GB'],i=Math.floor(Math.log(b)/Math.log(k)); return parseFloat((b/Math.pow(k,i)).toFixed(2))+' '+s[i]; }
+function submitUpload(e) {
+  e.preventDefault(); if(!selectedFile){showToast('Please select a file','error');return;} const cat=document.getElementById('material-category').value; if(!cat){showToast('Please select a category','error');return;}
+  document.getElementById('upload-progress').classList.remove('hidden'); let p=0;
+  const iv=setInterval(()=>{ p+=Math.random()*20; if(p>=100){p=100;clearInterval(iv);completeUpload();} document.getElementById('progress-fill').style.width=p+'%'; document.getElementById('progress-text').textContent=Math.round(p)+'%'; },200);
+}
+function completeUpload() {
+  const cat=document.getElementById('material-category').value, desc=document.getElementById('material-description').value, ext=selectedFile.name.split('.').pop().toLowerCase();
+  if(!materialsData[currentCourseId]) materialsData[currentCourseId]=[];
+  materialsData[currentCourseId].unshift({id:Date.now(),filename:selectedFile.name,type:ext,category:cat,description:desc,uploader:'John Smith',size:formatFileSize(selectedFile.size),downloads:0,date:new Date().toISOString().split('T')[0]});
+  localStorage.setItem('courseMaterials',JSON.stringify(materialsData)); loadMaterials(); closeUploadModal(); showToast('Material uploaded successfully!','success');
+}
+function showToast(msg,type='info') {
+  const t=document.getElementById('toast'),icons={success:'check-circle',error:'x-circle',info:'info'};
+  t.className=`toast ${type}`; document.getElementById('toast-icon').setAttribute('data-lucide',icons[type]); document.getElementById('toast-message').textContent=msg; t.classList.add('show'); lucide.createIcons(); setTimeout(()=>t.classList.remove('show'),3000);
+}
+</script>
+</body>
+</html>

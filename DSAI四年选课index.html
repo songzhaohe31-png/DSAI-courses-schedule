@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>HKMU DSAI Course Planner</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>tailwind.config={theme:{extend:{colors:{'hkmu-blue':'#0066CC','hkmu-green':'#2E7D52','hkmu-light-blue':'#E3F2FD','hkmu-light-green':'#E8F5E9','page-bg':'#F5F7FA','text-primary':'#1A1A2E','text-secondary':'#6B7280'}}}}</script>
+<style>
+*{font-family:'Inter',sans-serif}
+@keyframes gradientShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+.animated-gradient{background:linear-gradient(135deg,#0066CC,#2E7D52,#0066CC);background-size:200% 200%;animation:gradientShift 8s ease infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-20px)}}
+.float-shape{animation:float 6s ease-in-out infinite}
+.course-card{transition:all .3s ease}.course-card:hover{transform:translateY(-4px);box-shadow:0 10px 25px -5px rgba(0,0,0,.1)}
+.tab-active{border-bottom:2px solid #0066CC;color:#0066CC;font-weight:600}
+.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:1000;justify-content:center;align-items:center}
+.modal.active{display:flex}
+.progress-bar{transition:width 1s ease}
+</style>
+</head>
+<body class="bg-page-bg text-text-primary">
+<nav class="bg-white shadow-md sticky top-0 z-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-16">
+    <div class="flex items-center space-x-3">
+      <div class="w-10 h-10 bg-gradient-to-br from-hkmu-blue to-hkmu-green rounded-lg flex items-center justify-center"><i data-lucide="graduation-cap" class="w-6 h-6 text-white"></i></div>
+      <span class="text-xl font-bold">HKMU DSAI Planner</span>
+    </div>
+    <div class="hidden md:flex items-center space-x-6">
+      <button onclick="showPage('home')" class="nav-link text-hkmu-blue font-semibold hover:text-hkmu-blue transition-colors">Home</button>
+      <button onclick="showPage('progress')" class="nav-link text-text-secondary hover:text-hkmu-blue transition-colors">Degree Progress</button>
+      <button onclick="showPage('courses')" class="nav-link text-text-secondary hover:text-hkmu-blue transition-colors">All Courses</button>
+      <button onclick="showPage('plan')" class="nav-link text-text-secondary hover:text-hkmu-blue transition-colors">Study Plan</button>
+    </div>
+    <button id="mobileMenuBtn" class="md:hidden p-2 rounded-lg hover:bg-gray-100"><i data-lucide="menu" class="w-6 h-6"></i></button>
+  </div>
+  <div id="mobileMenu" class="hidden md:hidden bg-white border-t px-4 py-3 space-y-2">
+    <button onclick="showPage('home')" class="block w-full text-left py-2 px-4 rounded-lg hover:bg-hkmu-light-blue text-hkmu-blue font-semibold">Home</button>
+    <button onclick="showPage('progress')" class="block w-full text-left py-2 px-4 rounded-lg hover:bg-gray-100 text-text-secondary">Degree Progress</button>
+    <button onclick="showPage('courses')" class="block w-full text-left py-2 px-4 rounded-lg hover:bg-gray-100 text-text-secondary">All Courses</button>
+    <button onclick="showPage('plan')" class="block w-full text-left py-2 px-4 rounded-lg hover:bg-gray-100 text-text-secondary">Study Plan</button>
+  </div>
+</nav>
+<main id="mainContent"></main>
+<div id="courseModal" class="modal"><div class="bg-white rounded-2xl max-w-3xl w-full mx-4 max-h-[90vh] overflow-y-auto"><div id="courseModalContent"></div></div></div>
+<div id="toast" class="fixed bottom-4 right-4 bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg transform translate-y-20 opacity-0 transition-all duration-300 z-50"><span id="toastMessage"></span></div>
+<script>
+const coursesData = [
+  {id:"COMP1080SEF",code:"COMP 1080SEF",name:"Introduction to Computer Programming",credits:3,category:"core",year:1,semester:"autumn",prerequisites:[],description:"Fundamental programming concepts using Python. Covers variables, control structures, functions, and basic data structures."},
+  {id:"IT1020SEF",code:"IT 1020SEF",name:"Computing Fundamentals",credits:3,category:"core",year:1,semester:"autumn",prerequisites:[],description:"Introduction to computer systems, hardware, software, and basic IT concepts."},
+  {id:"MATH1410SEF",code:"MATH 1410SEF",name:"Algebra and Calculus",credits:3,category:"core",year:1,semester:"autumn",prerequisites:[],description:"Mathematical foundations including linear algebra, differential and integral calculus."},
+  {id:"ENGL1101AEF",code:"ENGL 1101AEF",name:"University English: Reading and Writing",credits:3,category:"english",year:1,semester:"autumn",prerequisites:[],description:"Academic English reading and writing skills for university-level coursework."},
+  {id:"GEN001",code:"GEN 001",name:"General Education Course 1",credits:3,category:"general-ed",year:1,semester:"autumn",prerequisites:[],description:"First general education course covering broad interdisciplinary topics."},
+  {id:"COMP2090SEF",code:"COMP 2090SEF",name:"Data Structures, Algorithms & Problem Solving",credits:3,category:"core",year:1,semester:"spring",prerequisites:["COMP1080SEF"],description:"Advanced data structures and algorithms for efficient problem solving."},
+  {id:"IT1030SEF",code:"IT 1030SEF",name:"Introduction to Internet Application Development",credits:3,category:"core",year:1,semester:"spring",prerequisites:[],description:"Web development fundamentals including HTML, CSS, and JavaScript."},
+  {id:"STAT1510SEF",code:"STAT 1510SEF",name:"Probability & Distributions",credits:3,category:"core",year:1,semester:"spring",prerequisites:[],description:"Probability theory and statistical distributions."},
+  {id:"STAT2610SEF",code:"STAT 2610SEF",name:"Data Analytics with Applications",credits:3,category:"core",year:1,semester:"spring",prerequisites:[],description:"Introduction to data analytics methods and tools."},
+  {id:"ENGL1202EEF",code:"ENGL 1202EEF",name:"University English: Listening and Speaking",credits:3,category:"english",year:1,semester:"spring",prerequisites:[],description:"Academic English listening and speaking skills."},
+  {id:"COMP2020SEF",code:"COMP 2020SEF",name:"Java Programming Fundamentals",credits:3,category:"core",year:2,semester:"autumn",prerequisites:[],description:"Object-oriented programming with Java."},
+  {id:"COMP2640SEF",code:"COMP 2640SEF",name:"Discrete Mathematics",credits:3,category:"core",year:2,semester:"autumn",prerequisites:[],description:"Discrete mathematical structures for computer science."},
+  {id:"MATH2150SEF",code:"MATH 2150SEF",name:"Linear Algebra",credits:3,category:"core",year:2,semester:"autumn",prerequisites:[],description:"Advanced linear algebra concepts."},
+  {id:"STAT2510SEF",code:"STAT 2510SEF",name:"Statistical Data Analysis",credits:3,category:"core",year:2,semester:"autumn",prerequisites:[],description:"Statistical methods for data analysis."},
+  {id:"GEN002",code:"GEN 002",name:"General Education Course 2",credits:3,category:"general-ed",year:1,semester:"spring",prerequisites:[],description:"Second general education course."},
+  {id:"COMP2030SEF",code:"COMP 2030SEF",name:"Intermediate Java Programming & UI Design",credits:3,category:"core",year:2,semester:"spring",prerequisites:[],description:"Advanced Java programming and user interface design."},
+  {id:"IT2900SEF",code:"IT 2900SEF",name:"Human Computer Interaction & UX Design",credits:3,category:"core",year:2,semester:"spring",prerequisites:[],description:"Principles of human-computer interaction and user experience design."},
+  {id:"STAT2520SEF",code:"STAT 2520SEF",name:"Applied Statistical Methods",credits:3,category:"core",year:2,semester:"spring",prerequisites:[],description:"Applied statistical methods for real-world problems."},
+  {id:"STAT2630SEF",code:"STAT 2630SEF",name:"Big Data Analytics with Applications",credits:3,category:"core",year:2,semester:"spring",prerequisites:[],description:"Big data technologies and analytics applications."},
+  {id:"COMP3200SEF",code:"COMP 3200SEF",name:"Database Management",credits:3,category:"core",year:3,semester:"autumn",prerequisites:[],description:"Database design, SQL, and database management systems."},
+  {id:"COMP3500SEF",code:"COMP 3500SEF",name:"Software Engineering",credits:3,category:"core",year:3,semester:"autumn",prerequisites:[],description:"Software engineering principles and practices."},
+  {id:"STAT3660SEF",code:"STAT 3660SEF",name:"SAS Programming",credits:3,category:"core",year:3,semester:"autumn",prerequisites:[],description:"Statistical analysis using SAS software."},
+  {id:"UNI2002BEW",code:"UNI 2002BEW",name:"Effective Communication and Teamwork",credits:3,category:"university-core",year:2,semester:"spring",prerequisites:[],description:"Communication and teamwork skills for professional environments."},
+  {id:"UNI1002ABW",code:"UNI 1002ABW",name:"University Core Values",credits:2,category:"university-core",year:1,semester:"autumn",prerequisites:[],description:"Introduction to university core values and academic integrity."},
+  {id:"UNI1012ABW",code:"UNI 1012ABW",name:"Social Responsibilities",credits:1,category:"university-core",year:1,semester:"autumn",prerequisites:[],description:"Understanding social responsibilities and civic engagement."},
+  {id:"COMP3130SEF",code:"COMP 3130SEF",name:"Mobile Application Programming",credits:3,category:"core",year:3,semester:"autumn",prerequisites:[],description:"Mobile app development for iOS and Android platforms."},
+  {id:"COMP3510SEF",code:"COMP 3510SEF",name:"Software Project Management",credits:3,category:"core",year:3,semester:"spring",prerequisites:["COMP3500SEF"],description:"Project management methodologies for software development."},
+  {id:"COMP3920SEF",code:"COMP 3920SEF",name:"Machine Learning",credits:3,category:"core",year:3,semester:"spring",prerequisites:[],description:"Machine learning algorithms and applications."},
+  {id:"STAT3110SEF",code:"STAT 3110SEF",name:"Time Series Analysis & Forecasting",credits:3,category:"core",year:3,semester:"spring",prerequisites:[],description:"Time series analysis and forecasting methods."},
+  {id:"COMP4820SEF",code:"COMP 4820SEF",name:"Data Mining And Analytics",credits:3,category:"core",year:3,semester:"spring",prerequisites:[],description:"Data mining techniques and analytics."},
+  {id:"MATH4950SEF",code:"MATH 4950SEF",name:"Professional Placement",credits:3,category:"elective",year:3,semester:"summer",prerequisites:[],description:"Professional work placement in data science industry."},
+  {id:"COMP3810SEF",code:"COMP 3810SEF",name:"Server-side Technologies and Cloud Computing",credits:3,category:"core",year:4,semester:"autumn",prerequisites:[],description:"Server-side development and cloud computing platforms."},
+  {id:"COMP4330SEF",code:"COMP 4330SEF",name:"Advanced Programming & AI Algorithms",credits:3,category:"core",year:4,semester:"autumn",prerequisites:[],description:"Advanced AI algorithms and programming techniques."},
+  {id:"COMP4610SEF",code:"COMP 4610SEF",name:"Data Science Project",credits:6,category:"project",year:4,semester:"autumn",prerequisites:[],description:"Capstone project in data science."},
+  {id:"COMP4930SEF",code:"COMP 4930SEF",name:"Deep Learning",credits:3,category:"core",year:4,semester:"autumn",prerequisites:[],description:"Deep learning and neural networks."},
+  {id:"COMP4210SEF",code:"COMP 4210SEF",name:"Advanced Database & Data Warehousing",credits:3,category:"core",year:4,semester:"autumn",prerequisites:["COMP3200SEF"],description:"Advanced database systems and data warehousing."},
+  {id:"ELEC4310SEF",code:"ELEC 4310SEF",name:"Blockchain Technologies",credits:3,category:"elective",year:4,semester:"autumn",prerequisites:[],description:"Blockchain technology and applications."},
+  {id:"UNI3002BEW",code:"UNI 3002BEW",name:"Entrepreneurial Mindset and Leadership for Sustainability",credits:3,category:"university-core",year:4,semester:"autumn",prerequisites:[],description:"Entrepreneurship and leadership skills."},
+  {id:"ELEC3050SEF",code:"ELEC 3050SEF",name:"Computer Networking",credits:3,category:"elective",year:3,semester:"autumn",prerequisites:[],description:"Computer network fundamentals and protocols."},
+  {id:"COMP4610SEF2",code:"COMP 4610SEF",name:"Data Science Project",credits:6,category:"project",year:4,semester:"spring",prerequisites:[],description:"Capstone project in data science."},
+  {id:"COMP4630SEF",code:"COMP 4630SEF",name:"Distributed Systems & Parallel Computing",credits:3,category:"elective",year:3,semester:"spring",prerequisites:[],description:"Distributed systems and parallel computing concepts."},
+  {id:"COMP4600SEF",code:"COMP 4600SEF",name:"Advanced Topics in Data Mining",credits:3,category:"core",year:4,semester:"spring",prerequisites:[],description:"Advanced topics in data mining and knowledge discovery."},
+  {id:"ELEC3250SEF",code:"ELEC 3250SEF",name:"Computer & Network Security",credits:3,category:"elective",year:3,semester:"spring",prerequisites:["ELEC3050SEF"],description:"Computer and network security principles."},
+  {id:"ELEC4710SEF",code:"ELEC 4710SEF",name:"Digital Forensics",credits:3,category:"elective",year:4,semester:"spring",prerequisites:[],description:"Digital forensics investigation techniques."}
+];
+
+let userProgress = JSON.parse(localStorage.getItem('dsai_progress')) || {};
+const saveProgress = () => localStorage.setItem('dsai_progress', JSON.stringify(userProgress));
+const getCourseStatus = id => userProgress[id] || 'not_started';
+function setCourseStatus(id, status) { userProgress[id] = status; saveProgress(); showToast(`Course marked as ${status.replace('_',' ')}`); }
+function checkPrerequisites(id) { const c = coursesData.find(x => x.id === id); if (!c || !c.prerequisites.length) return {canSelect:true,missing:[]}; const missing = c.prerequisites.filter(p => getCourseStatus(p) !== 'completed'); return {canSelect:!missing.length,missing}; }
+function getEffectiveStatus(id) { const s = getCourseStatus(id); return s === 'not_started' ? (checkPrerequisites(id).canSelect ? 'available' : 'locked') : s; }
+
+let reviewsData = JSON.parse(localStorage.getItem('dsai_reviews')) || {"COMP1080SEF":[{id:1,author:"Alice Wong",year:2,semester:"2024 Autumn",rating:5,content:"Great introduction to programming! The assignments were challenging but very helpful.",helpful:12,date:"2024-01-15"},{id:2,author:"Bob Chan",year:2,semester:"2024 Autumn",rating:4,content:"Good course structure. Need more practice exercises.",helpful:8,date:"2024-01-10"}],"COMP3920SEF":[{id:3,author:"Carol Li",year:4,semester:"2024 Spring",rating:5,content:"Excellent machine learning course! The professor explains concepts very clearly.",helpful:15,date:"2024-05-20"},{id:4,author:"David Chen",year:4,semester:"2024 Spring",rating:5,content:"One of the best courses in the program. Highly recommended!",helpful:10,date:"2024-05-18"}],"COMP3200SEF":[{id:5,author:"Emma Liu",year:4,semester:"2024 Autumn",rating:4,content:"Very practical database course. SQL skills are essential for data science.",helpful:9,date:"2024-01-08"}]};
+const saveReviews = () => localStorage.setItem('dsai_reviews', JSON.stringify(reviewsData));
+let materialsData = JSON.parse(localStorage.getItem('dsai_materials')) || {"COMP1080SEF":[{id:1,filename:"Lecture_Notes_Week1-6.pdf",category:"lectureNote",size:2500000,uploader:"Prof. Smith",downloads:45,date:"2024-01-10"},{id:2,filename:"Assignment1_Solutions.pdf",category:"assignment",size:800000,uploader:"TA John",downloads:32,date:"2024-01-15"}],"COMP3920SEF":[{id:3,filename:"ML_Cheat_Sheet.pdf",category:"tutorialNote",size:1200000,uploader:"Carol Li",downloads:78,date:"2024-03-20"},{id:4,filename:"Final_Project_Guidelines.pdf",category:"assignment",size:1500000,uploader:"Prof. Johnson",downloads:56,date:"2024-04-01"}]};
+const saveMaterials = () => localStorage.setItem('dsai_materials', JSON.stringify(materialsData));
+
+function showToast(msg) { const t=document.getElementById('toast'); document.getElementById('toastMessage').textContent=msg; t.classList.remove('translate-y-20','opacity-0'); setTimeout(()=>t.classList.add('translate-y-20','opacity-0'),3000); }
+function formatFileSize(b) { if(b<1024)return b+' B'; if(b<1048576)return(b/1024).toFixed(1)+' KB'; return(b/1048576).toFixed(1)+' MB'; }
+const catColors = {core:'bg-blue-100 text-blue-800',elective:'bg-purple-100 text-purple-800',project:'bg-amber-100 text-amber-800',english:'bg-emerald-100 text-emerald-800','general-ed':'bg-pink-100 text-pink-800','university-core':'bg-indigo-100 text-indigo-800'};
+const getCategoryColor = cat => catColors[cat] || 'bg-gray-100 text-gray-800';
+const statusBgs = {completed:'bg-green-100 text-green-800','in-progress':'bg-orange-100 text-orange-800',available:'bg-blue-100 text-blue-800',locked:'bg-gray-100 text-gray-600'};
+const getStatusBg = s => statusBgs[s] || 'bg-gray-100 text-gray-600';
+
+function showPage(pageName) {
+  document.querySelectorAll('.nav-link').forEach(l => { l.classList.remove('text-hkmu-blue','font-semibold'); l.classList.add('text-text-secondary'); });
+  document.querySelectorAll('.nav-link').forEach(b => { if((b.getAttribute('onclick')||'').includes("'"+pageName+"'")){ b.classList.remove('text-text-secondary'); b.classList.add('text-hkmu-blue','font-semibold'); } });
+  document.getElementById('mobileMenu').classList.add('hidden');
+  const renders = {home:renderHomePage,progress:renderProgressPage,courses:renderCoursesPage,plan:renderPlanPage};
+  if(renders[pageName]) document.getElementById('mainContent').innerHTML = renders[pageName]();
+  lucide.createIcons();
+}
+
+function renderHomePage() {
+  return `<section class="animated-gradient relative overflow-hidden min-h-[500px] flex items-center">
+<div class="absolute top-10 right-10 w-32 h-32 bg-white/10 rounded-full float-shape"></div>
+<div class="absolute bottom-10 left-10 w-24 h-24 bg-white/10 rounded-full float-shape" style="animation-delay:2s"></div>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 relative z-10 w-full"><div class="text-center max-w-3xl mx-auto">
+<span class="inline-block px-4 py-2 bg-white/20 rounded-full text-white text-sm font-medium mb-6"><i data-lucide="sparkles" class="w-4 h-4 inline mr-2"></i>HKMU Data Science & AI Program</span>
+<h1 class="text-5xl font-bold text-white mb-6">DSAI Course Planner</h1>
+<p class="text-xl text-white/90 mb-8">Your comprehensive companion for navigating the Data Science and AI Bachelor's program at HKMU. Track progress, explore courses, and plan your academic journey.</p>
+<div class="flex flex-col sm:flex-row gap-4 justify-center">
+<button onclick="showPage('progress')" class="bg-white text-hkmu-blue px-8 py-4 rounded-xl font-semibold flex items-center justify-center gap-2"><i data-lucide="bar-chart-2" class="w-5 h-5"></i>View Progress</button>
+<button onclick="showPage('courses')" class="bg-white/20 text-white border-2 border-white/50 px-8 py-4 rounded-xl font-semibold flex items-center justify-center gap-2"><i data-lucide="book-open" class="w-5 h-5"></i>Browse Courses</button>
+</div></div></div>
+<div class="absolute bottom-0 left-0 right-0"><svg viewBox="0 0 1440 120" fill="none"><path d="M0 120L60 110C120 100 240 80 360 70C480 60 600 60 720 65C840 70 960 80 1080 85C1200 90 1320 90 1380 90L1440 90V120H0Z" fill="#F5F7FA"/></svg></div>
+</section>
+<section class="py-16 bg-page-bg"><div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"><div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
+${[{n:43,label:'Total Courses',color:'text-hkmu-blue',icon:'book-open'},{n:120,label:'Total Credits',color:'text-hkmu-green',icon:'award'},{n:4,label:'Years',color:'text-orange-500',icon:'calendar'},{n:6,label:'Categories',color:'text-purple-600',icon:'layers'}].map(s=>`<div class="bg-white rounded-2xl p-6 shadow-md text-center"><i data-lucide="${s.icon}" class="w-8 h-8 ${s.color} mx-auto mb-2"></i><div class="text-4xl font-bold ${s.color} mb-1">${s.n}</div><div class="text-text-secondary">${s.label}</div></div>`).join('')}
+</div></div></section>
+<section class="py-16 bg-white"><div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"><h2 class="text-3xl font-bold text-center mb-12">Everything You Need</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+${[{icon:'bar-chart-2',label:'Track Progress',desc:'Monitor your degree completion with visual progress indicators.',page:'progress',from:'from-hkmu-blue',to:'to-blue-600'},{icon:'message-square',label:'Course Reviews',desc:'Read honest feedback from past students about courses.',page:'courses',from:'from-orange-500',to:'to-orange-600'},{icon:'folder-open',label:'Study Materials',desc:'Access shared notes, lecture slides, and resources.',page:'courses',from:'from-hkmu-green',to:'to-green-600'},{icon:'git-branch',label:'Prerequisites',desc:'Check course requirements and plan your academic path.',page:'plan',from:'from-purple-600',to:'to-purple-700'}].map(f=>`<div class="bg-page-bg rounded-2xl p-6 hover:shadow-lg transition-all hover:-translate-y-1 cursor-pointer" onclick="showPage('${f.page}')"><div class="w-14 h-14 bg-gradient-to-br ${f.from} ${f.to} rounded-xl flex items-center justify-center mb-5"><i data-lucide="${f.icon}" class="w-7 h-7 text-white"></i></div><h3 class="text-xl font-bold mb-3">${f.label}</h3><p class="text-text-secondary">${f.desc}</p></div>`).join('')}
+</div></div></section>
+<section class="py-16 bg-page-bg"><div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"><h2 class="text-3xl font-bold text-center mb-12">Quick Links</h2>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+<div class="bg-white rounded-2xl p-6 shadow-md"><h3 class="text-xl font-bold mb-6">Browse by Year</h3><div class="space-y-3">
+${[1,2,3,4].map(y=>`<button onclick="showYearCourses(${y})" class="w-full flex items-center justify-between p-4 bg-page-bg rounded-xl hover:bg-hkmu-light-blue transition-colors"><div class="flex items-center gap-3"><span class="w-8 h-8 bg-hkmu-blue text-white rounded-lg flex items-center justify-center font-bold">${y}</span><span class="font-medium">Year ${y} Courses</span></div><i data-lucide="chevron-right" class="w-5 h-5 text-text-secondary"></i></button>`).join('')}
+</div></div>
+<div class="bg-white rounded-2xl p-6 shadow-md"><h3 class="text-xl font-bold mb-6">Browse by Category</h3><div class="space-y-3">
+${[{id:'core',name:'Core Courses',credits:84,c:'bg-blue-500'},{id:'elective',name:'Elective Courses',credits:12,c:'bg-purple-500'},{id:'project',name:'Project Courses',credits:6,c:'bg-amber-500'},{id:'english',name:'English Enhancement',credits:6,c:'bg-emerald-500'},{id:'general-ed',name:'General Education',credits:6,c:'bg-pink-500'},{id:'university-core',name:'University Core',credits:9,c:'bg-indigo-500'}].map(cat=>`<button onclick="showCategoryCourses('${cat.id}')" class="w-full flex items-center justify-between p-4 bg-page-bg rounded-xl hover:bg-hkmu-light-blue transition-colors"><div class="flex items-center gap-3"><span class="w-3 h-3 ${cat.c} rounded-full"></span><span class="font-medium">${cat.name}</span></div><div class="flex items-center gap-2"><span class="text-sm text-text-secondary">${cat.credits} cr</span><i data-lucide="chevron-right" class="w-5 h-5 text-text-secondary"></i></div></button>`).join('')}
+</div></div></div></div></section>`;
+}
+
+function renderProgressPage() {
+  const total=120, done=coursesData.filter(c=>getCourseStatus(c.id)==='completed').reduce((s,c)=>s+c.credits,0), inProg=coursesData.filter(c=>getCourseStatus(c.id)==='in-progress').reduce((s,c)=>s+c.credits,0), pct=Math.round(done/total*100);
+  const cats=[{id:'core',name:'Core Courses',total:84},{id:'elective',name:'Elective Courses',total:12},{id:'project',name:'Project Courses',total:6},{id:'english',name:'English Enhancement',total:6},{id:'general-ed',name:'General Education',total:6},{id:'university-core',name:'University Core',total:9}];
+  return `<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8"><h1 class="text-3xl font-bold mb-2">Degree Progress</h1><p class="text-text-secondary mb-8">Track your Data Science BSc journey</p>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+${[{icon:'graduation-cap',label:'Total Required',val:total,c:'text-hkmu-blue'},{icon:'check-circle',label:'Completed',val:done,c:'text-green-500'},{icon:'clock',label:'In Progress',val:inProg,c:'text-orange-500'},{icon:'target',label:'Remaining',val:total-done,c:'text-blue-500'}].map(s=>`<div class="bg-white rounded-2xl p-6 shadow-md"><div class="flex items-center gap-3 mb-2"><i data-lucide="${s.icon}" class="w-6 h-6 ${s.c}"></i><span class="text-text-secondary">${s.label}</span></div><div class="text-3xl font-bold ${s.c}">${s.val}</div><div class="text-sm text-text-secondary">credits</div></div>`).join('')}
+</div>
+<div class="bg-white rounded-2xl p-6 shadow-md mb-8"><h2 class="text-xl font-bold mb-4">Overall Progress</h2>
+<div class="relative h-6 bg-gray-200 rounded-full overflow-hidden"><div class="absolute top-0 left-0 h-full bg-gradient-to-r from-hkmu-blue to-hkmu-green rounded-full progress-bar" style="width:${pct}%"></div></div>
+<div class="flex justify-between mt-2 text-sm text-text-secondary"><span>${pct}% complete</span><span>${done} / ${total} credits</span></div></div>
+<div class="bg-white rounded-2xl p-6 shadow-md mb-8"><h2 class="text-xl font-bold mb-4">Category Breakdown</h2><div class="space-y-4">
+${cats.map(cat=>{const cd=coursesData.filter(c=>c.category===cat.id&&getCourseStatus(c.id)==='completed').reduce((s,c)=>s+c.credits,0),cp=Math.round(cd/cat.total*100);return`<div><div class="flex justify-between mb-1"><span class="font-medium">${cat.name}</span><span class="text-sm text-text-secondary">${cd}/${cat.total} cr (${cp}%)</span></div><div class="relative h-3 bg-gray-200 rounded-full overflow-hidden"><div class="absolute top-0 left-0 h-full bg-hkmu-blue rounded-full progress-bar" style="width:${cp}%"></div></div></div>`;}).join('')}
+</div></div>
+<div class="space-y-6"><h2 class="text-xl font-bold">Year-by-Year Progress</h2>
+${[1,2,3,4].map(year=>{const yc=coursesData.filter(c=>c.year===year),yd=yc.filter(c=>getCourseStatus(c.id)==='completed').reduce((s,c)=>s+c.credits,0),yt=yc.reduce((s,c)=>s+c.credits,0);return`<div class="bg-white rounded-2xl p-6 shadow-md"><div class="flex justify-between items-center mb-4"><h3 class="text-lg font-bold">Year ${year}</h3><span class="text-sm text-text-secondary">${yd}/${yt} credits</span></div><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">${yc.map(course=>renderCourseCard(course)).join('')}</div></div>`;}).join('')}
+</div></div>`;
+}
+
+function renderCoursesPage() {
+  return `<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8"><h1 class="text-3xl font-bold mb-2">All Courses</h1><p class="text-text-secondary mb-8">Browse the complete Data Science curriculum</p>
+<div class="bg-white rounded-2xl p-6 shadow-md mb-8"><div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+<div><label class="block text-sm font-medium text-text-secondary mb-2">Search</label><input type="text" id="searchInput" placeholder="Search courses..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-hkmu-blue" oninput="filterCourses()"></div>
+<div><label class="block text-sm font-medium text-text-secondary mb-2">Year</label><select id="yearFilter" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-hkmu-blue" onchange="filterCourses()"><option value="">All Years</option>${[1,2,3,4].map(y=>`<option value="${y}">Year ${y}</option>`).join('')}</select></div>
+<div><label class="block text-sm font-medium text-text-secondary mb-2">Category</label><select id="categoryFilter" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-hkmu-blue" onchange="filterCourses()"><option value="">All Categories</option><option value="core">Core</option><option value="elective">Elective</option><option value="project">Project</option><option value="english">English</option><option value="general-ed">General Ed</option><option value="university-core">University Core</option></select></div>
+<div><label class="block text-sm font-medium text-text-secondary mb-2">Status</label><select id="statusFilter" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-hkmu-blue" onchange="filterCourses()"><option value="">All Status</option><option value="completed">Completed</option><option value="in-progress">In Progress</option><option value="available">Available</option><option value="locked">Locked</option></select></div>
+</div></div>
+<div id="coursesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">${coursesData.map(renderCourseCard).join('')}</div></div>`;
+}
+
+function renderPlanPage() {
+  return `<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8"><h1 class="text-3xl font-bold mb-2">Study Plan</h1><p class="text-text-secondary mb-8">Visualize course prerequisites and plan your academic path</p>
+<div class="bg-white rounded-2xl p-6 shadow-md"><h2 class="text-xl font-bold mb-6">Prerequisite Map</h2><div class="space-y-8">
+${[1,2,3,4].map(year=>`<div><h3 class="text-lg font-bold text-hkmu-blue mb-4">Year ${year}</h3><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+${coursesData.filter(c=>c.year===year).map(course=>`<div class="border-2 ${getCourseStatus(course.id)==='completed'?'border-green-500 bg-green-50':'border-gray-200 bg-white'} rounded-xl p-4"><div class="flex justify-between items-start mb-2"><span class="text-sm font-semibold text-hkmu-blue">${course.code}</span><span class="text-xs px-2 py-1 rounded-full ${getCategoryColor(course.category)}">${course.category}</span></div><div class="text-sm font-medium mb-2">${course.name}</div>${course.prerequisites.length?`<div class="text-xs text-text-secondary"><span class="font-medium">Prerequisites:</span> ${course.prerequisites.map(p=>{const pre=coursesData.find(c=>c.id===p);return pre?pre.code:p;}).join(', ')}</div>`:'<div class="text-xs text-green-600 font-medium">No prerequisites</div>'}</div>`).join('')}
+</div></div>`).join('')}
+</div></div></div>`;
+}
+
+function renderCourseCard(course) {
+  const status=getEffectiveStatus(course.id);
+  const icons={completed:'<i data-lucide="check-circle" class="w-5 h-5 text-green-500"></i>','in-progress':'<i data-lucide="clock" class="w-5 h-5 text-orange-500"></i>',available:'<i data-lucide="circle" class="w-5 h-5 text-blue-500"></i>',locked:'<i data-lucide="lock" class="w-5 h-5 text-gray-400"></i>'};
+  return `<div class="course-card bg-white rounded-xl p-5 shadow-md cursor-pointer ${status==='locked'?'opacity-60':''}" ${status!=='locked'?`onclick="openCourseModal('${course.id}')"`:''}><div class="flex justify-between items-start mb-3"><span class="text-sm font-bold text-hkmu-blue">${course.code}</span>${icons[status]}</div><h3 class="font-semibold mb-2 line-clamp-2">${course.name}</h3><div class="flex items-center gap-2 mb-3"><span class="text-xs px-2 py-1 rounded-full ${getCategoryColor(course.category)}">${course.category.replace('-',' ')}</span><span class="text-xs text-text-secondary">${course.credits} cr</span></div>${course.prerequisites.length?`<div class="text-xs text-text-secondary">Pre: ${course.prerequisites.map(p=>{const pre=coursesData.find(c=>c.id===p);return pre?pre.code.split(' ')[0]:p;}).join(', ')}</div>`:''}</div>`;
+}
+
+function filterCourses() {
+  const search=document.getElementById('searchInput').value.toLowerCase(), year=document.getElementById('yearFilter').value, cat=document.getElementById('categoryFilter').value, stat=document.getElementById('statusFilter').value;
+  const filtered=coursesData.filter(c=>(!search||(c.name.toLowerCase().includes(search)||c.code.toLowerCase().includes(search)))&&(!year||c.year===parseInt(year))&&(!cat||c.category===cat)&&(!stat||getEffectiveStatus(c.id)===stat));
+  document.getElementById('coursesGrid').innerHTML=filtered.map(renderCourseCard).join('');
+  lucide.createIcons();
+}
+
+function openCourseModal(courseId) {
+  const course=coursesData.find(c=>c.id===courseId); if(!course) return;
+  const status=getEffectiveStatus(courseId), reviews=reviewsData[courseId]||[], materials=materialsData[courseId]||[], avg=reviews.length?(reviews.reduce((s,r)=>s+r.rating,0)/reviews.length).toFixed(1):'0.0';
+  document.getElementById('courseModalContent').innerHTML=`<div class="p-6">
+<div class="flex justify-between items-start mb-6"><div><span class="inline-block px-3 py-1 rounded-full text-sm font-medium ${getStatusBg(status)} mb-2">${status.replace('-',' ').toUpperCase()}</span><h2 class="text-2xl font-bold">${course.code}</h2><p class="text-lg text-text-secondary">${course.name}</p></div><button onclick="closeCourseModal()" class="p-2 hover:bg-gray-100 rounded-lg"><i data-lucide="x" class="w-6 h-6"></i></button></div>
+<div class="grid grid-cols-4 gap-4 mb-6">${[['Credits',course.credits],['Year',course.year],['Semester',course.semester],['Rating',avg+' ⭐']].map(([l,v])=>`<div class="bg-page-bg rounded-lg p-3 text-center"><div class="text-sm text-text-secondary">${l}</div><div class="text-xl font-bold capitalize">${v}</div></div>`).join('')}</div>
+<div class="mb-6"><h3 class="font-semibold mb-2">Description</h3><p class="text-text-secondary">${course.description}</p></div>
+${course.prerequisites.length?`<div class="mb-6"><h3 class="font-semibold mb-2">Prerequisites</h3><div class="flex flex-wrap gap-2">${course.prerequisites.map(p=>{const pre=coursesData.find(c=>c.id===p);const ps=getCourseStatus(p);return`<span class="px-3 py-1 rounded-full text-sm ${ps==='completed'?'bg-green-100 text-green-700':'bg-gray-100 text-gray-600'}">${pre?pre.code:p}</span>`;}).join('')}</div></div>`:''}
+<div class="mb-6"><h3 class="font-semibold mb-3">Update Status</h3><div class="flex gap-3">
+<button onclick="setCourseStatus('${courseId}','completed');openCourseModal('${courseId}')" class="flex-1 py-2 px-4 bg-green-500 text-white rounded-lg hover:bg-green-600 flex items-center justify-center gap-2"><i data-lucide="check" class="w-4 h-4"></i>Completed</button>
+<button onclick="setCourseStatus('${courseId}','in-progress');openCourseModal('${courseId}')" class="flex-1 py-2 px-4 bg-orange-500 text-white rounded-lg hover:bg-orange-600 flex items-center justify-center gap-2"><i data-lucide="clock" class="w-4 h-4"></i>In Progress</button>
+<button onclick="setCourseStatus('${courseId}','not_started');openCourseModal('${courseId}')" class="flex-1 py-2 px-4 bg-gray-500 text-white rounded-lg hover:bg-gray-600 flex items-center justify-center gap-2"><i data-lucide="rotate-ccw" class="w-4 h-4"></i>Reset</button>
+</div></div>
+<div class="border-b mb-4"><div class="flex gap-6"><button onclick="switchModalTab('reviews','${courseId}')" class="pb-2 tab-active" id="tab-reviews">Reviews (${reviews.length})</button><button onclick="switchModalTab('materials','${courseId}')" class="pb-2 text-text-secondary hover:text-text-primary" id="tab-materials">Materials (${materials.length})</button></div></div>
+<div id="modal-reviews" class="space-y-4 max-h-64 overflow-y-auto">${reviews.length?reviews.map(r=>`<div class="bg-page-bg rounded-lg p-4"><div class="flex justify-between items-start mb-2"><div><div class="font-semibold">${r.author}</div><div class="text-sm text-text-secondary">Year ${r.year} • ${r.semester}</div></div><div>${Array(r.rating).fill('⭐').join('')}</div></div><p class="text-text-secondary text-sm mb-2">${r.content}</p><button onclick="likeReview('${courseId}',${r.id})" class="flex items-center gap-1 text-sm text-text-secondary hover:text-hkmu-blue"><i data-lucide="thumbs-up" class="w-4 h-4"></i>${r.helpful}</button></div>`).join(''):'<p class="text-text-secondary text-center py-4">No reviews yet. Be the first to review!</p>'}</div>
+<div id="modal-materials" class="space-y-4 max-h-64 overflow-y-auto hidden">${materials.length?materials.map(m=>`<div class="bg-page-bg rounded-lg p-4 flex justify-between items-center"><div class="flex items-center gap-3"><i data-lucide="file-text" class="w-8 h-8 text-hkmu-blue"></i><div><div class="font-medium">${m.filename}</div><div class="text-sm text-text-secondary">${m.category} • ${formatFileSize(m.size)} • ${m.downloads} downloads</div></div></div><button onclick="downloadMaterial('${courseId}',${m.id})" class="p-2 hover:bg-hkmu-light-blue rounded-lg text-hkmu-blue"><i data-lucide="download" class="w-5 h-5"></i></button></div>`).join(''):'<p class="text-text-secondary text-center py-4">No materials uploaded yet.</p>'}</div>
+</div>`;
+  document.getElementById('courseModal').classList.add('active');
+  lucide.createIcons();
+}
+
+function closeCourseModal() { document.getElementById('courseModal').classList.remove('active'); }
+function switchModalTab(tab) {
+  ['reviews','materials'].forEach(t=>{ document.getElementById('tab-'+t).classList.toggle('tab-active',t===tab); document.getElementById('tab-'+t).classList.toggle('text-text-secondary',t!==tab); document.getElementById('modal-'+t).classList.toggle('hidden',t!==tab); });
+}
+function likeReview(courseId,reviewId) { const r=(reviewsData[courseId]||[]).find(r=>r.id===reviewId); if(r){r.helpful++;saveReviews();openCourseModal(courseId);showToast('Review marked as helpful!');} }
+function downloadMaterial(courseId,matId) { const m=(materialsData[courseId]||[]).find(m=>m.id===matId); if(m){m.downloads++;saveMaterials();showToast(`Downloading ${m.filename}...`);} }
+function showYearCourses(year) { document.getElementById('mainContent').innerHTML=renderCoursesPage(); document.getElementById('yearFilter').value=year; filterCourses(); lucide.createIcons(); }
+function showCategoryCourses(cat) { document.getElementById('mainContent').innerHTML=renderCoursesPage(); document.getElementById('categoryFilter').value=cat; filterCourses(); lucide.createIcons(); }
+
+document.addEventListener('DOMContentLoaded',function(){
+  document.getElementById('mainContent').innerHTML=renderHomePage();
+  lucide.createIcons();
+  document.getElementById('mobileMenuBtn').addEventListener('click',()=>document.getElementById('mobileMenu').classList.toggle('hidden'));
+  document.getElementById('courseModal').addEventListener('click',e=>{ if(e.target===document.getElementById('courseModal')) closeCourseModal(); });
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeCourseModal(); });
+});
+</script>
+<script src="bridge.js"></script>
+</body>
+</html>
